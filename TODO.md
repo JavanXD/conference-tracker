@@ -260,12 +260,23 @@ Cross-cutting: **trust** (verification), **fresh data** (`conferences.csv` + pip
 - [x] Add collapsible filters on small screens with explicit toggle buttons and `aria-expanded`.
 - [x] Increase button touch targets and spacing for better mobile tap reliability.
 - [x] Prevent global horizontal page panning by moving from page-level x-scroll to component-level overflow handling.
+- [x] Mobile Discover CTA simplification (2026-10-04): sticky bottom nav; search + 4 persona presets; Filters panel (default closed, active count badge); hide summary metrics + export toolbar; lean cards with full-width Add/Save; detail sheet primary CTA.
+- [x] Progressive disclosure for filters on mobile (search always on; selects behind Filters; advanced still nested).
+- [x] Mobile plan polish (2026-10-05): always-visible `shown / total` count beside Conferences; Sort promoted into Filters panel (not behind “Show more”).
+- [x] Visual refresh (2026-10-05): drop neon-green mono “terminal” look — Sora UI + IBM Plex Mono for dates; walnut/cream palette (no blue), light panels.
+- [x] Catalog dedupe (2026-10-05): one-fact-per-column in `docs/CATALOG.md` + `update-conference-data` skill; strip implied `Talks|Trainings|Workshops` from `submission_tracks` (120 cleared, 38 trimmed); scrub notes that repeated URLs/columns (50 rows); `scripts/normalize_catalog_dedupe.py` + CI rejects implied tracks / link-URL-in-notes.
+- [x] Catalog structure harden (2026-10-05): empty deadlines → `TBD` (66 cells); `submission_tracks` allowlist (`CTF|Villages|Panels|…`, Contests→CTF); notes rewritten to `history:`/`cfp:`/`speakers:`/`src:` segments (177 rows); CI rejects empty deadlines, bad track tokens, ISO dates / bare URLs in notes.
+- [x] Split `website_or_cfp_link` → `website` + `cfp_link` (2026-10-05): 24-column header; heuristic migrate (homepage vs portal); app CfP falls back to website; Site/CfP distinct in detail; normalize + validate + public sync.
+- [x] Table readability (2026-10-05): hide dense columns (End/Days/Acad/500+) on desktop; optional cols collapse &lt;1100px; sticky Name; stronger zebra/hover (drop neon); mono dates; Actions min-width; compact month toggles.
+- [x] Brand assets (2026-10-05): new walnut favicon (`favicon.svg`/`.ico` + apple-touch) and 1200×630 `social-preview.png` OG image; theme-color + cache-bust query; public synced.
+- [x] Event timing filters (2026-10-05): Discover **Event year** + multi-select **Event months** (e.g. Jan–Feb 2027) for travel/speaking windows; URL/localStorage shareable; sorts to conference date when months picked.
+- [x] CSS theme consistency (2026-10-05): purge neon-green leftovers — primary-btn, map markers, leaflet chrome, footer noscript, filters badge contrast, theme-color sync with app toggle; invalid `font-weight: 650` → 600; public synced.
 
 ### Next UI iteration (high priority)
 
-- [ ] Add progressive disclosure for filters (basic vs advanced groups) to reduce first-screen cognitive load.
 - [ ] Improve table header accessibility further with explicit keyboard hint text and clearer filter-cycle feedback.
-- [ ] Simplify mobile nav hierarchy (role + section + tab) to reduce mode-switch confusion.
+- [ ] Optional: show End/Days/Acad/500+ via a “More columns” toggle for power users (currently hidden on desktop for scan clarity; still in detail sheet).
+- [ ] Simplify mobile nav hierarchy further (persona vs Pipeline/Trips labeling) if user testing still finds mode confusion.
 - [ ] Run a focused mobile accessibility QA pass (iOS Safari + Android Chrome) and record issues.
 
 ### Validation checklist for this track

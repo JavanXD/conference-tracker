@@ -21,8 +21,11 @@
     theme = "light";
   }
   document.documentElement.setAttribute("data-theme", theme);
-  var meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", theme === "light" ? "#f4f7f5" : "#050707");
+  var themeColor = theme === "light" ? "#ddd2c4" : "#1a1410";
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) {
+    meta.setAttribute("content", themeColor);
+    meta.removeAttribute("media");
+  });
 
   var existing = document.getElementById("appStyles");
   if (existing) {

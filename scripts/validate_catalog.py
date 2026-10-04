@@ -14,6 +14,36 @@ CATALOG_PATH = REPO / "docs" / "CATALOG.md"
 
 MM_DD = re.compile(r"^(TBD|\d{2}-\d{2})$")
 ISO_DATE = re.compile(r"^(TBD|\d{4}-\d{2}-\d{2})$")
+ISO_IN_TEXT = re.compile(r"\b20\d{2}-\d{2}-\d{2}\b")
+URL_IN_TEXT = re.compile(r"https?://[^\s;|,]+", re.I)
+
+IMPLIED_TRACKS = frozenset(
+    {"talks", "trainings", "workshops", "training", "workshop", "talk", "keynotes", "keynote"}
+)
+ALLOWED_TRACKS = frozenset(
+    {
+        "CTF",
+        "Villages",
+        "Panels",
+        "Briefings",
+        "Unconference",
+        "Exhibition",
+        "Mentorship",
+    }
+)
+LINK_FIELDS = (
+    "website",
+    "cfp_link",
+    "cft_link",
+    "cfw_link",
+    "cfv_link",
+)
+DEADLINE_FIELDS = (
+    "cfp_deadline_MM-DD",
+    "cft_deadline_MM-DD",
+    "cfw_deadline_MM-DD",
+    "cfv_deadline_MM-DD",
+)
 
 
 def load_expected_header() -> list[str]:
@@ -25,13 +55,13 @@ def load_expected_header() -> list[str]:
     raise SystemExit(f"Could not find CSV header in {CATALOG_PATH}")
 
 
-def normalize_deadline(value: str) -> str:
-    clean = value.strip()
-    return clean if clean else "TBD"
-
-
 def validate_mm_dd(value: str, field: str, row_num: int, errors: list[str]) -> None:
-    clean = normalize_deadline(value)
+    clean = value.strip()
+    if not clean:
+        errors.append(
+            f"row {row_num}: empty {field} (use TBD or MM-DD; empty not allowed)"
+        )
+        return
     if not MM_DD.match(clean):
         errors.append(f"row {row_num}: invalid {field} {value!r} (expected MM-DD or TBD)")
 
@@ -41,6 +71,16 @@ def validate_iso_date(value: str, field: str, row_num: int, errors: list[str]) -
         errors.append(
             f"row {row_num}: invalid {field} {value!r} (expected YYYY-MM-DD or TBD)"
         )
+
+
+def urls_allowed_in_notes(notes: str) -> set[str]:
+    """URLs that appear in src: segments are allowed."""
+    allowed: set[str] = set()
+    for m in re.finditer(r"(?i)\bsrc:\s*([^;]+)", notes):
+        for u in URL_IN_TEXT.findall(m.group(1)):
+            allowed.add(u.rstrip(").,]"))
+            allowed.add(u.rstrip(").,]").rstrip("/"))
+    return allowed
 
 
 def main() -> int:
@@ -90,13 +130,8 @@ def main() -> int:
             else:
                 names[key] = row_num
 
-            for field in (
-                "cfp_deadline_MM-DD",
-                "cft_deadline_MM-DD",
-                "cfw_deadline_MM-DD",
-                "cfv_deadline_MM-DD",
-            ):
-                validate_mm_dd(record[field].strip(), field, row_num, errors)
+            for field in DEADLINE_FIELDS:
+                validate_mm_dd(record[field], field, row_num, errors)
 
             for field in (
                 "conference_start_date",
@@ -104,6 +139,55 @@ def main() -> int:
                 "last_verified_date",
             ):
                 validate_iso_date(record[field].strip(), field, row_num, errors)
+
+            tracks_raw = record.get("submission_tracks", "").strip()
+            if tracks_raw:
+                for tok in re.split(r"[|,]", tracks_raw):
+                    t = tok.strip()
+                    if not t:
+                        continue
+                    if t.casefold() in IMPLIED_TRACKS:
+                        errors.append(
+                            f"row {row_num}: submission_tracks must not include "
+                            f"{t!r} (implied by deadline/link columns; extras only)"
+                        )
+                    elif t not in ALLOWED_TRACKS:
+                        allowed = "|".join(sorted(ALLOWED_TRACKS))
+                        errors.append(
+                            f"row {row_num}: submission_tracks token {t!r} not in "
+                            f"allowlist ({allowed})"
+                        )
+
+            notes = record.get("notes", "")
+            note_urls = {
+                u.rstrip(").,]") for u in URL_IN_TEXT.findall(notes)
+            }
+            note_urls |= {u.rstrip("/") for u in note_urls}
+            for field in LINK_FIELDS:
+                url = record.get(field, "").strip()
+                if not url:
+                    continue
+                # Exact URL token only (same-host deeper paths in src: are OK)
+                if url in note_urls or url.rstrip("/") in note_urls:
+                    errors.append(
+                        f"row {row_num}: notes repeats {field} URL "
+                        f"(keep URL only in {field})"
+                    )
+
+            if ISO_IN_TEXT.search(notes):
+                errors.append(
+                    f"row {row_num}: notes contain ISO date "
+                    f"(use conference_*_date columns or history: YYYY City)"
+                )
+
+            allowed_urls = urls_allowed_in_notes(notes)
+            for u in URL_IN_TEXT.findall(notes):
+                clean = u.rstrip(").,]")
+                if clean not in allowed_urls and clean.rstrip("/") not in allowed_urls:
+                    errors.append(
+                        f"row {row_num}: notes URL must be in a src: segment "
+                        f"(found {clean!r})"
+                    )
 
     if errors:
         for msg in errors:

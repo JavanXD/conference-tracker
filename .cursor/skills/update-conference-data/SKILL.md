@@ -5,11 +5,14 @@ description: >-
   Use when the user asks to add a conference, update deadlines/links/location,
   fix missing data, verify CFP/CfT/CfW, enrich notes, or edit conference catalog
   entries. Schema: docs/CATALOG.md. Requires web research from official sources before writing values.
+  Keep one fact per column; never duplicate city/dates/deadlines/URLs into notes;
+  use website + cfp_link (not a combined column); leave submission_tracks empty unless
+  extras (CTF/Panels/Villages) remain after deadlines/links.
 ---
 
 # Update conference data (`data/conferences.csv`)
 
-**Schema, enums, UI mapping:** [`docs/CATALOG.md`](../../../docs/CATALOG.md) — do not duplicate column lists here.  
+**Schema, enums, UI mapping, notes format:** [`docs/CATALOG.md`](../../../docs/CATALOG.md) — do not invent parallel rules here.  
 **PR workflow:** [CONTRIBUTING.md](../../../CONTRIBUTING.md).
 
 ## Scope
@@ -39,22 +42,40 @@ Use **WebSearch** / **WebFetch** until you can cite official evidence.
 
 **Source order:** (1) official site + CFP pages (2) Sessionize / PaperCall / Pretalx / vendor CFP (3) organizer posts if site stale (4) aggregators **as leads only** — verify before writing.
 
-**Collect:** start/end `YYYY-MM-DD`, `MM-DD` deadlines (or `TBD`), direct URLs, city/country, type, IANA timezone, sponsorship if stated, concise `notes`. **`submission_tracks`:** only non-obvious extras (`CTF`, `Panels`, `Villages`) — omit `Talks`/`Trainings`/`Workshops` when deadlines or `cft_`/`cfw_` links already imply them ([`docs/CATALOG.md` — Name badges](../../../docs/CATALOG.md#name-badges)).
+**Collect into columns first** (not notes):
+
+| Fact | Column(s) |
+|------|-----------|
+| Start / end | `conference_start_date`, `conference_end_date` (`YYYY-MM-DD` or `TBD`) |
+| Deadlines | `cfp_` / `cft_` / `cfw_` / `cfv_` `*_deadline_MM-DD` (`MM-DD` or `TBD`) |
+| URLs | `website` (homepage), `cfp_link` (talk portal if distinct), `cft_link`, `cfw_link`, `cfv_link` |
+| Place | `city`, `country` |
+| Format / TZ | `conference_type`, `timezone` |
+| Sponsorship enum | `travel_accommodation_sponsorship` |
+
+Then write **`notes`** only for leftovers per [Notes format](../../../docs/CATALOG.md#notes-format): short blurb; optional `history:`, `cfp:`, `speakers:`, `src:` segments separated by `; `.
+
+### `submission_tracks` (minify)
+
+- Omit `Talks` / `Trainings` / `Workshops` / `Keynotes` — implied or not program extras.
+- Allowlist only: `CTF`, `Villages`, `Panels`, `Briefings`, `Unconference`, `Exhibition`, `Mentorship` (pipe-separated).
+- Map `Contests` → `CTF`. Never store topic tags (`AI`, `Tech`, …).
+- Leave empty when there are no extras.
+- Deadline cells: always `MM-DD` or `TBD` (never blank).
 
 ### Dates when the row is stale or empty
 
 1. Official site (blog, FAQ, archives) + **CfP Watch** / submission portals.
-2. Verified listings (e.g. Crossweb) — confirm on organizer or official source.
-3. **Write:** latest edition start/end for this row’s city; matching `cfp_deadline_MM-DD` (not another city’s cycle); edition history + relocation in `notes`; `venue_pattern` `Rotating` if city/format changed; `last_verified_date` = today.
-
-Example pattern (Code Europe Kraków): conference `2025-06-30`–`2025-07-01`, CfP `03-30`, notes list 2023–2025 Kraków + 2026 Warsaw on main site.
+2. Verified listings — confirm on organizer or official source.
+3. **Write:** latest edition start/end for this row’s city; matching `cfp_deadline_MM-DD`; prior years in `history:` notes segment; `venue_pattern` `Rotating` if city/format changed; `last_verified_date` = today.
 
 ### Hard limits
 
 - **Never invent** dates, deadlines, or URLs.
 - **`TBD` / `Unknown`** when not verifiable.
-- Prefer **last official edition** over `TBD` conference dates for recurring events; `Estimated …` in `notes` only when inferring without an announcement.
-- Open CfP, no close date → deadline `TBD`, URL in link column, note in `notes`.
+- Prefer **last official edition** over `TBD` conference dates for recurring events.
+- Open CfP, no close date → deadline `TBD`, URL in link column, `cfp: open close unlisted` in notes (not a prose dump).
+- **Never** copy city, ISO dates, `MM-DD`, or primary portal URLs into `notes`.
 
 ## CSV editing
 
@@ -65,7 +86,9 @@ Quoted commas; empty optional links; bump `last_verified_date` on every touched 
 ```
 - [ ] Row located or confirmed new
 - [ ] Official site + CFP checked
-- [ ] Fields match docs/CATALOG.md (or TBD/Unknown)
+- [ ] Structured fields filled; deadlines MM-DD or TBD (never blank)
+- [ ] notes use blurb + optional history:/cfp:/speakers:/src: (no column dupes / bare URLs)
+- [ ] submission_tracks allowlisted extras only (or empty)
 - [ ] last_verified_date + notes/sources
 - [ ] User summary ready
 ```
@@ -79,14 +102,17 @@ Quoted commas; empty optional links; bump `last_verified_date` on every touched 
 
 ## Verify locally (optional)
 
-`python3 -m http.server 8000` → `index.html`; no CSV console warnings; deadline filters sane.
+`python3 scripts/validate_catalog.py`  
+`python3 -m http.server 8000` → `index.html`
 
 ## Examples
 
 | Case | Do |
 |------|-----|
-| CfP open, no close | `cfp_*` = `TBD`, PaperCall URL, note “open, close not published” |
-| CfP closed | Keep `MM-DD`; keep conference dates |
-| Backfill old editions only | Latest start/end; 2023, 2024… in `notes`; CfP close for **that** edition |
+| CfP open, no close | `cfp_*=TBD`, portal URL in link column, notes `cfp: open close unlisted` |
+| CfP closed | Keep `MM-DD`; keep conference dates; do not restate date in notes |
+| Talks only | Empty `submission_tracks` |
+| Talks + CTF | `submission_tracks=CTF` |
+| Prior editions | `history: 2023 City; 2024 City` — not full date reprint if columns hold latest |
 | New BSides | New row; pretalx/sessionize; `venue_pattern` when known |
-| City moved | Note + separate row if user wants new city tracked |
+| City moved | `history:` + note; separate row if user wants new city tracked |

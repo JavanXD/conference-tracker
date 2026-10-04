@@ -8,10 +8,11 @@
   <meta name="keywords" content="cybersecurity conferences, infosec conferences, hacking conferences, CFP deadlines, CFT, CFW, security call for papers" />
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
   <meta name="author" content="Conference Tracker" />
-  <meta name="theme-color" content="#f4f7f5" />
+  <meta name="theme-color" content="#1a1410" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#ddd2c4" media="(prefers-color-scheme: light)" />
   <meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
   <style>
-    .site-footer { margin-top: 8px; padding: 20px 16px 16px; border-top: 1px solid #1f3a2f; background: #0a0f0c; }
+    .site-footer { margin-top: 8px; padding: 20px 16px 16px; border-top: 1px solid #3d3127; background: #1a1410; }
     .footer-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); gap: 18px 24px; }
     .footer-inner { max-width: 1200px; margin: 0 auto; }
     @media (max-width: 900px) { .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .footer-brand { grid-column: 1 / -1; } }
@@ -19,8 +20,9 @@
   </style>
   <script src="./assets/bootstrap.js?v=7ddef06" data-v="7ddef06"></script>
   <link id="appStyles" rel="stylesheet" href="./styles.css?v=7ddef06" />
-  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" sizes="any" />
-  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico?v=20261005" sizes="any" />
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg?v=20261005" />
+  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=20261005" />
   <link rel="canonical" href="https://conference-tracker.rasok.at/" />
 
   <meta property="og:type" content="website" />
@@ -29,27 +31,31 @@
   <meta property="og:url" content="https://conference-tracker.rasok.at/" />
   <meta property="og:site_name" content="Conference Tracker" />
   <meta property="og:locale" content="en_US" />
-  <meta property="og:image" content="https://conference-tracker.rasok.at/assets/social-preview.png" />
-  <meta property="og:image:secure_url" content="https://conference-tracker.rasok.at/assets/social-preview.png" />
+  <meta property="og:image" content="https://conference-tracker.rasok.at/assets/social-preview.png?v=20261005" />
+  <meta property="og:image:secure_url" content="https://conference-tracker.rasok.at/assets/social-preview.png?v=20261005" />
   <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Cybersecurity Conference Tracker with global CFP, CFT, and CFW deadline insights." />
+  <meta property="og:image:alt" content="Conference Tracker — CFP, CfT, and CfW deadlines with a world map." />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Cybersecurity Conference Tracker" />
   <meta name="twitter:description" content="Track global cybersecurity CFP/CFT/CFW deadlines with fast filtering, status views, and world map insights." />
   <meta name="twitter:url" content="https://conference-tracker.rasok.at/" />
-  <meta name="twitter:image" content="https://conference-tracker.rasok.at/assets/social-preview.png" />
-  <meta name="twitter:image:alt" content="Cybersecurity Conference Tracker with global CFP, CFT, and CFW deadline insights." />
-  <link rel="image_src" href="https://conference-tracker.rasok.at/assets/social-preview.png" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; img-src 'self' data: https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org; connect-src 'self' https://geocoding-api.open-meteo.com; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests; block-all-mixed-content" />
+  <meta name="twitter:image" content="https://conference-tracker.rasok.at/assets/social-preview.png?v=20261005" />
+  <meta name="twitter:image:alt" content="Conference Tracker — CFP, CfT, and CfW deadlines with a world map." />
+  <link rel="image_src" href="https://conference-tracker.rasok.at/assets/social-preview.png?v=20261005" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' data: https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org; connect-src 'self' https://geocoding-api.open-meteo.com; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests; block-all-mixed-content" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <!-- HTTP Referrer-Policy + X-Frame-Options also set by javan-gh-pages-headers Worker -->
   <meta http-equiv="Permissions-Policy" content="accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=(), document-domain=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), usb=(), xr-spatial-tracking=()" />
   <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin" />
   <meta http-equiv="Cross-Origin-Resource-Policy" content="same-origin" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <script type="application/ld+json">
     {
@@ -162,77 +168,121 @@
     </div>
 
     <section class="tab-panel" id="panelDashboard">
-      <section class="card filters-card" aria-label="Conference filters">
-      <div class="discover-quick-actions" id="discoverQuickActions" role="toolbar" aria-label="Speaker shortcuts" hidden>
-        <button type="button" class="btn-secondary discover-quick-btn" data-speaker-preset="discover">Open CfPs</button>
-        <button type="button" class="btn-secondary discover-quick-btn" data-speaker-preset="due_14">≤14d</button>
-        <button type="button" class="btn-secondary discover-quick-btn" data-speaker-preset="travel">Travel</button>
-        <button type="button" class="btn-secondary discover-quick-btn" data-speaker-preset="industry">Industry</button>
-        <button type="button" class="btn-secondary discover-quick-btn" data-speaker-preset="pipeline">Pipeline</button>
-        <button type="button" class="btn-secondary discover-quick-btn" data-speaker-preset="region_europe">Europe</button>
-        <button type="button" class="btn-secondary discover-quick-btn" data-speaker-preset="region_americas">Americas</button>
-        <button type="button" class="btn-secondary discover-quick-btn" data-speaker-preset="region_apac">APAC</button>
+      <section class="card filters-card" id="filtersCard" aria-label="Conference filters">
+      <div class="discover-quick-actions" id="discoverQuickActions" role="toolbar" aria-label="Discover shortcuts" hidden>
+        <button type="button" class="btn-secondary discover-quick-btn speaker-preset" data-speaker-preset="discover">Open CfPs</button>
+        <button type="button" class="btn-secondary discover-quick-btn speaker-preset" data-speaker-preset="due_14">≤14d</button>
+        <button type="button" class="btn-secondary discover-quick-btn speaker-preset" data-speaker-preset="travel">Travel</button>
+        <button type="button" class="btn-secondary discover-quick-btn speaker-preset" data-speaker-preset="industry">Industry</button>
+        <button type="button" class="btn-secondary discover-quick-btn speaker-preset desktop-only-preset" data-speaker-preset="pipeline">Pipeline</button>
+        <button type="button" class="btn-secondary discover-quick-btn speaker-preset desktop-only-preset" data-speaker-preset="region_europe">Europe</button>
+        <button type="button" class="btn-secondary discover-quick-btn speaker-preset desktop-only-preset" data-speaker-preset="region_americas">Americas</button>
+        <button type="button" class="btn-secondary discover-quick-btn speaker-preset desktop-only-preset" data-speaker-preset="region_apac">APAC</button>
+        <button type="button" class="btn-secondary discover-quick-btn attendee-preset" data-attendee-preset="favorites_only" hidden>Favorites</button>
+        <button type="button" class="btn-secondary discover-quick-btn attendee-preset" data-attendee-preset="attendees_500" hidden>500+</button>
       </div>
-      <div id="filtersWrap">
-      <div class="filters" id="filters">
-        <div class="field">
+      <div class="filters-layout">
+        <div class="field search-field">
           <label for="searchInput">Search (name, city, country)</label>
           <input id="searchInput" type="search" placeholder="Type to search…" aria-keyshortcuts="Alt+F" autocomplete="off" />
         </div>
-        <div class="field">
-          <label for="favoritesFilter">Favorites</label>
-          <select id="favoritesFilter" aria-label="Favorites">
-            <option value="">All conferences</option>
-            <option value="yes">Starred only</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="attendeesFilter">500+ attendees</label>
-          <select id="attendeesFilter" aria-label="500 plus attendees"><option value="">All</option></select>
-        </div>
-        <div class="field speaker-only">
-          <label for="acceptsCfpFilter">CfP deadline</label>
-          <select id="acceptsCfpFilter" aria-label="Filter by published CfP deadline MM-DD"><option value="">All</option></select>
-        </div>
-        <div class="field speaker-only">
-          <label for="acceptsCftFilter">CfT deadline</label>
-          <select id="acceptsCftFilter" aria-label="Filter by published CfT deadline MM-DD"><option value="">All</option></select>
-        </div>
-        <div class="field speaker-only">
-          <label for="acceptsCfwFilter">CfW deadline</label>
-          <select id="acceptsCfwFilter" aria-label="Filter by published CfW deadline MM-DD"><option value="">All</option></select>
-        </div>
-        <div class="field advanced-filter speaker-only">
-          <label for="academicFilter">Academic level</label>
-          <select id="academicFilter" aria-label="Academic acceptance level"><option value="">All</option></select>
-        </div>
-        <div class="field advanced-filter speaker-only">
-          <label for="sponsorshipFilter">Travel sponsorship</label>
-          <select id="sponsorshipFilter" aria-label="Travel or accommodation sponsorship"><option value="">All</option></select>
-        </div>
-        <div class="field advanced-filter" id="advancedFiltersGroup">
-          <label for="typeFilter">Conference type</label>
-          <select id="typeFilter" aria-label="In person, hybrid, or virtual"><option value="">All</option></select>
-        </div>
-        <div class="field advanced-filter">
-          <label for="sortFilter">Sort by</label>
-          <select id="sortFilter" aria-label="Sort table rows">
-            <option value="deadline_soon">Soonest CfX deadline</option>
-            <option value="start_soon">Conference date soonest</option>
-            <option value="name_asc">Name A–Z</option>
-            <option value="attendees_name">500+ attendees, then name</option>
-          </select>
-        </div>
-      </div>
-      </div>
-      <div class="filters-toolbar" role="toolbar" aria-label="Filter actions">
-        <button type="button" id="advancedFiltersBtn" class="btn-secondary" aria-expanded="false" aria-controls="advancedFiltersGroup">
-          Show more filters
+        <button
+          type="button"
+          id="filtersPanelToggle"
+          class="btn-secondary filters-panel-toggle mobile-only-btn"
+          aria-expanded="false"
+          aria-controls="filtersPanelBody"
+        >
+          <span class="filters-panel-toggle-label">Filters</span>
+          <span id="filtersActiveBadge" class="filters-active-badge" hidden></span>
         </button>
-        <button id="resetBtn" type="button" class="btn-secondary btn-with-icon" aria-keyshortcuts="Alt+0" aria-label="Reset filters (Alt+0)">
-          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14 10V3.5c0-.83-.67-1.5-1.5-1.5S11 2.67 11 3.5V10l-7.78 7.83c-.63.64-.18 1.67.77 1.67h16.02c.95 0 1.4-1.03.77-1.67L14 10zM5 19h14v2H5v-2z"/></svg>
-          <span>Reset filters</span>
-        </button>
+        <div id="filtersPanelBody" class="filters-panel-body">
+          <div id="filtersWrap">
+            <div class="filters" id="filters">
+              <div class="field panel-filter">
+                <label for="favoritesFilter">Favorites</label>
+                <select id="favoritesFilter" aria-label="Favorites">
+                  <option value="">All conferences</option>
+                  <option value="yes">Starred only</option>
+                </select>
+              </div>
+              <div class="field panel-filter">
+                <label for="eventYearFilter">Event year</label>
+                <select id="eventYearFilter" aria-label="Filter by conference year">
+                  <option value="">Any year</option>
+                </select>
+              </div>
+              <div class="field panel-filter event-months-field">
+                <span class="field-label" id="eventMonthsLabel">Event months</span>
+                <div
+                  class="month-toggles"
+                  id="eventMonthsFilter"
+                  role="group"
+                  aria-labelledby="eventMonthsLabel"
+                >
+                  <button type="button" class="month-toggle" data-month="1" aria-pressed="false">Jan</button>
+                  <button type="button" class="month-toggle" data-month="2" aria-pressed="false">Feb</button>
+                  <button type="button" class="month-toggle" data-month="3" aria-pressed="false">Mar</button>
+                  <button type="button" class="month-toggle" data-month="4" aria-pressed="false">Apr</button>
+                  <button type="button" class="month-toggle" data-month="5" aria-pressed="false">May</button>
+                  <button type="button" class="month-toggle" data-month="6" aria-pressed="false">Jun</button>
+                  <button type="button" class="month-toggle" data-month="7" aria-pressed="false">Jul</button>
+                  <button type="button" class="month-toggle" data-month="8" aria-pressed="false">Aug</button>
+                  <button type="button" class="month-toggle" data-month="9" aria-pressed="false">Sep</button>
+                  <button type="button" class="month-toggle" data-month="10" aria-pressed="false">Oct</button>
+                  <button type="button" class="month-toggle" data-month="11" aria-pressed="false">Nov</button>
+                  <button type="button" class="month-toggle" data-month="12" aria-pressed="false">Dec</button>
+                </div>
+              </div>
+              <div class="field panel-filter">
+                <label for="attendeesFilter">500+ attendees</label>
+                <select id="attendeesFilter" aria-label="500 plus attendees"><option value="">All</option></select>
+              </div>
+              <div class="field panel-filter speaker-only">
+                <label for="acceptsCfpFilter">CfP deadline</label>
+                <select id="acceptsCfpFilter" aria-label="Filter by published CfP deadline MM-DD"><option value="">All</option></select>
+              </div>
+              <div class="field panel-filter speaker-only">
+                <label for="acceptsCftFilter">CfT deadline</label>
+                <select id="acceptsCftFilter" aria-label="Filter by published CfT deadline MM-DD"><option value="">All</option></select>
+              </div>
+              <div class="field panel-filter speaker-only">
+                <label for="acceptsCfwFilter">CfW deadline</label>
+                <select id="acceptsCfwFilter" aria-label="Filter by published CfW deadline MM-DD"><option value="">All</option></select>
+              </div>
+              <div class="field advanced-filter speaker-only">
+                <label for="academicFilter">Academic level</label>
+                <select id="academicFilter" aria-label="Academic acceptance level"><option value="">All</option></select>
+              </div>
+              <div class="field advanced-filter speaker-only">
+                <label for="sponsorshipFilter">Travel sponsorship</label>
+                <select id="sponsorshipFilter" aria-label="Travel or accommodation sponsorship"><option value="">All</option></select>
+              </div>
+              <div class="field panel-filter">
+                <label for="sortFilter">Sort by</label>
+                <select id="sortFilter" aria-label="Sort table rows">
+                  <option value="deadline_soon">Soonest CfX deadline</option>
+                  <option value="start_soon">Conference date soonest</option>
+                  <option value="name_asc">Name A–Z</option>
+                  <option value="attendees_name">500+ attendees, then name</option>
+                </select>
+              </div>
+              <div class="field advanced-filter" id="advancedFiltersGroup">
+                <label for="typeFilter">Conference type</label>
+                <select id="typeFilter" aria-label="In person, hybrid, or virtual"><option value="">All</option></select>
+              </div>
+            </div>
+          </div>
+          <div class="filters-toolbar" role="toolbar" aria-label="Filter actions">
+            <button type="button" id="advancedFiltersBtn" class="btn-secondary" aria-expanded="false" aria-controls="advancedFiltersGroup">
+              Show more filters
+            </button>
+            <button id="resetBtn" type="button" class="btn-secondary btn-with-icon" aria-keyshortcuts="Alt+0" aria-label="Reset filters (Alt+0)">
+              <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14 10V3.5c0-.83-.67-1.5-1.5-1.5S11 2.67 11 3.5V10l-7.78 7.83c-.63.64-.18 1.67.77 1.67h16.02c.95 0 1.4-1.03.77-1.67L14 10zM5 19h14v2H5v-2z"/></svg>
+              <span>Reset filters</span>
+            </button>
+          </div>
+        </div>
       </div>
       <p class="meta" id="activeFilterMeta" role="status" aria-live="polite">No filters active</p>
       <div class="chips" id="activeFilterChips" aria-label="Active filters"></div>
@@ -240,7 +290,10 @@
     </section>
 
       <section class="card" aria-labelledby="resultsHeading">
-        <h2 id="resultsHeading">Conferences</h2>
+        <div class="results-heading-row">
+          <h2 id="resultsHeading">Conferences</h2>
+          <p class="results-count" id="resultsCount" aria-live="polite"></p>
+        </div>
         <p class="panel-hint results-panel-hint">
           Click a name for details. Use ★ to favorite.
         </p>
@@ -263,18 +316,18 @@
               <tr>
                 <th data-sort-key="conference_name" class="clickable-th name-col" scope="col" aria-sort="none"><button type="button" class="th-btn" aria-label="Sort by name">Name</button></th>
                 <th scope="col" class="fav-col"><span class="visually-hidden">Favorite</span>★</th>
-                <th data-sort-key="attendees_500_plus" class="clickable-th" scope="col" aria-sort="none"><button type="button" class="th-btn" aria-label="Sort by 500 plus attendees">500+?</button></th>
-                <th data-sort-key="academic_acceptance_level" class="clickable-th acceptance-col-th speaker-only-col" scope="col" aria-sort="none"><button type="button" class="th-btn" aria-label="Sort by academic level">Acad</button></th>
-                <th class="speaker-only-col">Sponsor</th>
+                <th data-sort-key="attendees_500_plus" class="clickable-th col-dense-hide" scope="col" aria-sort="none"><button type="button" class="th-btn" aria-label="Sort by 500 plus attendees">500+?</button></th>
+                <th data-sort-key="academic_acceptance_level" class="clickable-th acceptance-col-th speaker-only-col col-dense-hide" scope="col" aria-sort="none"><button type="button" class="th-btn" aria-label="Sort by academic level">Acad</button></th>
+                <th class="speaker-only-col col-optional">Sponsor</th>
                 <th data-filter-key="acceptsCfp" class="clickable-th speaker-only-col" scope="col"><button type="button" class="th-btn" aria-label="Cycle filter for call for papers by deadline">CfP</button></th>
-                <th data-filter-key="acceptsCft" class="clickable-th speaker-only-col" scope="col"><button type="button" class="th-btn" aria-label="Cycle filter for call for trainings by deadline">CfT</button></th>
-                <th data-filter-key="acceptsCfw" class="clickable-th speaker-only-col" scope="col"><button type="button" class="th-btn" aria-label="Cycle filter for call for workshops by deadline">CfW</button></th>
+                <th data-filter-key="acceptsCft" class="clickable-th speaker-only-col col-optional" scope="col"><button type="button" class="th-btn" aria-label="Cycle filter for call for trainings by deadline">CfT</button></th>
+                <th data-filter-key="acceptsCfw" class="clickable-th speaker-only-col col-optional" scope="col"><button type="button" class="th-btn" aria-label="Cycle filter for call for workshops by deadline">CfW</button></th>
                 <th data-sort-key="conference_start_date" class="clickable-th" scope="col" aria-sort="none"><button type="button" class="th-btn" aria-label="Sort by conference start date">Start</button></th>
-                <th data-sort-key="conference_end_date" class="clickable-th" scope="col" aria-sort="none"><button type="button" class="th-btn" aria-label="Sort by conference end date">End</button></th>
-                <th data-sort-key="conference_duration_days" class="clickable-th duration-col-th" scope="col" aria-sort="none"><button type="button" class="th-btn" aria-label="Sort by conference duration in days">Days</button></th>
+                <th data-sort-key="conference_end_date" class="clickable-th col-dense-hide" scope="col" aria-sort="none"><button type="button" class="th-btn" aria-label="Sort by conference end date">End</button></th>
+                <th data-sort-key="conference_duration_days" class="clickable-th duration-col-th col-dense-hide" scope="col" aria-sort="none"><button type="button" class="th-btn" aria-label="Sort by conference duration in days">Days</button></th>
                 <th data-sort-key="city" class="clickable-th" scope="col" aria-sort="none"><button type="button" class="th-btn" aria-label="Sort by city">City</button></th>
-                <th data-sort-key="country" class="clickable-th country-col-th" scope="col" aria-sort="none"><button type="button" class="th-btn" aria-label="Sort by country"><span class="visually-hidden">Country</span></button></th>
-                <th class="speaker-only-col">Next Due</th>
+                <th data-sort-key="country" class="clickable-th country-col-th col-optional" scope="col" aria-sort="none"><button type="button" class="th-btn" aria-label="Sort by country"><span class="visually-hidden">Country</span></button></th>
+                <th class="speaker-only-col next-due-col">Next Due</th>
                 <th scope="col" class="actions-col" aria-label="Actions"></th>
               </tr>
             </thead>
@@ -287,12 +340,14 @@
 
     <section class="tab-panel" id="panelMap" hidden>
       <section class="card map-card" aria-labelledby="mapHeading">
-        <h2 id="mapHeading">World map</h2>
-        <p class="panel-hint">Markers use city and country from the catalog. Choose whether to show all conferences or only the current filter.</p>
-        <div class="map-controls" id="mapControls" role="group" aria-label="Map data source">
-          <button type="button" data-map-source="all" class="active">All conferences</button>
-          <button type="button" data-map-source="filtered">Current filters</button>
+        <div class="map-toolbar">
+          <h2 id="mapHeading">World map</h2>
+          <div class="map-controls" id="mapControls" role="group" aria-label="Map data source">
+            <button type="button" data-map-source="all" class="active">All</button>
+            <button type="button" data-map-source="filtered">Filtered</button>
+          </div>
         </div>
+        <p class="panel-hint map-panel-hint">Markers use city and country from the catalog. Choose whether to show all conferences or only the current filter.</p>
         <div id="worldMap" role="img" aria-label="World map with conference city markers"></div>
         <p class="map-meta" id="mapMeta" aria-live="polite">Preparing map…</p>
       </section>

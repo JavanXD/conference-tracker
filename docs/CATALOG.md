@@ -9,7 +9,7 @@ Canonical reference for the static catalog in `data/`. The dashboard loads it wi
 ## Header (do not reorder)
 
 ```
-conference_name,priority_level,attendees_500_plus,academic_acceptance_level,submission_tracks,travel_accommodation_sponsorship,cfp_deadline_MM-DD,cft_deadline_MM-DD,cfw_deadline_MM-DD,cfv_deadline_MM-DD,conference_start_date,conference_end_date,city,country,website_or_cfp_link,cft_link,cfw_link,cfv_link,conference_type,timezone,notes,last_verified_date,venue_pattern
+conference_name,priority_level,attendees_500_plus,academic_acceptance_level,submission_tracks,travel_accommodation_sponsorship,cfp_deadline_MM-DD,cft_deadline_MM-DD,cfw_deadline_MM-DD,cfv_deadline_MM-DD,conference_start_date,conference_end_date,city,country,website,cfp_link,cft_link,cfw_link,cfv_link,conference_type,timezone,notes,last_verified_date,venue_pattern
 ```
 
 ## Columns
@@ -20,18 +20,52 @@ conference_name,priority_level,attendees_500_plus,academic_acceptance_level,subm
 | 2 | `priority_level` | `High` \| `Medium` \| `Low` — see [priority](#priority) |
 | 3 | `attendees_500_plus` | `Yes` \| `No` \| `Unknown` |
 | 4 | `academic_acceptance_level` | `Academic` \| `Industry` \| `Mixed` \| `Unknown` |
-| 5 | `submission_tracks` | Optional **extras only** (`CTF`, `Panels`, `Villages`, `Briefings`, …) — see [Name badges](#name-badges) |
+| 5 | `submission_tracks` | Optional **extras only** — allowlist: `CTF` \| `Villages` \| `Panels` \| `Briefings` \| `Unconference` \| `Exhibition` \| `Mentorship` (pipe-separated). See [Name badges](#name-badges) |
 | 6 | `travel_accommodation_sponsorship` | `Yes` \| `No` \| `Unknown` \| `Partial` |
 | 7–10 | `*_deadline_MM-DD` | `MM-DD` or `TBD` — **source of truth** per submission type; keep **past** close dates |
 | 11–12 | `conference_start_date`, `conference_end_date` | `YYYY-MM-DD` or `TBD` — fill **last official edition** when next year unknown; edition history / relocation in `notes` |
 | 13–14 | `city`, `country` | Plain text; `TBD` city ok; normalize country names — see [countries](#country-names) |
-| 15 | `website_or_cfp_link` | Main site or primary talk CfP |
-| 16–18 | `cft_link`, `cfw_link`, `cfv_link` | Dedicated portal only — see [links and UI](#links-and-ui) |
-| 19 | `conference_type` | `In-Person` \| `Hybrid` \| `Virtual` |
-| 20 | `timezone` | IANA id |
-| 21 | `notes` | Evidence, open CfP without close date, prior editions, `Estimated …` when inferring |
-| 22 | `last_verified_date` | `YYYY-MM-DD` — set to **today** on every row you touch |
-| 23 | `venue_pattern` | `Rotating` \| `Mostly Fixed` \| `Fixed` \| `Unknown` |
+| 15 | `website` | Conference homepage |
+| 16 | `cfp_link` | Dedicated talk CfP portal when distinct from homepage — see [links and UI](#links-and-ui) |
+| 17–19 | `cft_link`, `cfw_link`, `cfv_link` | Dedicated portal only — see [links and UI](#links-and-ui) |
+| 20 | `conference_type` | `In-Person` \| `Hybrid` \| `Virtual` |
+| 21 | `timezone` | IANA id |
+| 22 | `notes` | Extra evidence only — see [Notes format](#notes-format) (do **not** repeat other columns) |
+| 23 | `last_verified_date` | `YYYY-MM-DD` — set to **today** on every row you touch |
+| 24 | `venue_pattern` | `Rotating` \| `Mostly Fixed` \| `Fixed` \| `Unknown` |
+
+### One fact, one column
+
+| Fact | Store in | Never also put in `notes` / `submission_tracks` |
+|------|----------|-----------------------------------------------|
+| Name | `conference_name` | — |
+| City / country | `city`, `country` | — |
+| Edition dates | `conference_start_date`, `conference_end_date` | — |
+| Deadline closes | `cfp_` / `cft_` / `cfw_` / `cfv_` `*_deadline_MM-DD` | — |
+| Homepage / type URLs | `website`, `cfp_link`, `cft_link`, `cfw_link`, `cfv_link` | — |
+| Format / TZ | `conference_type`, `timezone` | — |
+| Travel support enum | `travel_accommodation_sponsorship` | Only **nuance** in notes (amounts, caps) |
+| Talks / trainings / workshops | Deadlines and/or type links | Not in `submission_tracks` |
+
+### Notes format
+
+`notes` is for **non-column** facts. Use short semicolon-separated segments agents can parse:
+
+```
+unique blurb; history: YYYY[ City]; …; cfp: open close unlisted; speakers: <nuance>; src: <secondary URL>
+```
+
+| Segment | When | Example |
+|---------|------|---------|
+| Leading blurb | Always if useful (≤ ~220 chars) | `WarCon-inspired invite-only Czech IT security` |
+| `history:` | Prior editions / relocation | `history: 2023 Prague; 2024 Prague; 2025 Prague` |
+| `cfp:` | Close date unlisted or multi-portal ambiguity | `cfp: open close unlisted` |
+| `speakers:` | Detail beyond Yes/Partial/No | `speakers: flight<=500EUR + 1 hotel night` |
+| `src:` | Secondary source only (not the primary link columns) | `src: https://cfp.directory/events/…` |
+
+**Forbidden in `notes`:** restating the conference name, city, country, start/end ISO dates, `MM-DD` deadlines, or any URL already in link columns. Any secondary URL must live in a `src:` segment. Do not paste the whole CFP page.
+
+**Maintainers:** `python3 scripts/normalize_catalog_dedupe.py` rewrites tracks/notes/deadlines toward this shape; `python3 scripts/validate_catalog.py` enforces it in CI.
 
 ### Deadlines (`MM-DD`)
 
@@ -40,7 +74,7 @@ conference_name,priority_level,attendees_500_plus,academic_acceptance_level,subm
 | Talk / training / workshop / volunteer close | `cfp_` / `cft_` / `cfw_` / `cfv_` |
 | No public or unknown close | `TBD` + explain in `notes` |
 
-Do **not** clear deadlines or conference dates when CfP is closed. Open on PaperCall/Sessionize with no close date → `TBD` + portal URL + note.
+Do **not** clear deadlines or conference dates when CfP is closed. Open on PaperCall/Sessionize with no close date → `TBD` + portal URL + note. **Never leave deadline cells empty** — use `TBD`.
 
 `MM-DD` is resolved against **conference edition year** from `conference_start_date` (CfP month-day before event start → prior calendar year). Actionable vs past is computed in `app.js`.
 
@@ -66,7 +100,8 @@ Single-day: same date in start and end. Stale CSV years still matter: missing co
 
 | Field | Rule |
 |-------|------|
-| `website_or_cfp_link` | Homepage or best talk CfP |
+| `website` | Conference homepage |
+| `cfp_link` | Distinct talk CfP portal (PaperCall/Sessionize/…); UI falls back to `website` if empty |
 | `cft_link` | Distinct training portal; implies **Trainings** (no need to repeat in `submission_tracks`) |
 | `cfw_link` | Distinct workshop portal; implies **Workshops** |
 | `cfv_link` | Volunteer / staff call |
@@ -84,7 +119,7 @@ Small letters beside the conference name (e.g. **C** = CTF) are **not** separate
 | `cfw_deadline_MM-DD` or `cfw_link` | **Workshops** implied — no **W** badge |
 | `submission_tracks` | Only tokens **not** implied above become badges (typically `CTF`, `Panels`, `Villages`) |
 
-**Minify CSV:** leave `submission_tracks` empty when the row only has talks/trainings/workshops via deadline/link columns; add `CTF|Villages` only for extra program types. Detail **Tracks** merges implied + listed tokens.
+**Minify CSV:** leave `submission_tracks` empty when the row only has talks/trainings/workshops via deadline/link columns; add allowlisted extras only (`CTF|Villages|Panels|…`). Map `Contests` → `CTF`. Do not store topic tags (`AI`, `Keynotes`, …). Detail **Tracks** merges implied + listed tokens.
 
 **Next Due / Start / End (display):** projects next calendar occurrence from stored dates (`est.`, italic dates); ICS and “open CfP” filters use **stored** values only. Pipeline/trip default year = projected occurrence.
 
@@ -93,8 +128,10 @@ Small letters beside the conference name (e.g. **C** = CTF) are **not** separate
 Quote fields that contain commas; escape `"` as `""`.
 
 ```csv
-ExampleCon,High,Yes,Industry,Talks,Unknown,03-15,TBD,TBD,TBD,2026-06-01,2026-06-03,Berlin,Germany,https://example.com/cfp,,,,In-Person,Europe/Berlin,"CFP Mar 15; hybrid.",2026-06-01,Rotating
+ExampleCon,High,Yes,Industry,,Unknown,03-15,TBD,TBD,TBD,2026-06-01,2026-06-03,Berlin,Germany,https://example.com,https://example.com/cfp,,,,In-Person,Europe/Berlin,"history: 2024 Berlin; 2025 Berlin",2026-06-01,Rotating
 ```
+
+(`submission_tracks` empty — talks implied by `cfp_deadline_MM-DD`. Homepage and CfP portal are separate columns; deadline and city live in columns, not notes.)
 
 ## Priority
 

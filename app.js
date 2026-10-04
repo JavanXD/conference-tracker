@@ -52,7 +52,8 @@
       "submission_tracks",
       "travel_accommodation_sponsorship",
       "conference_type",
-      "website_or_cfp_link",
+      "website",
+      "cfp_link",
       "cft_link",
       "cfw_link"
     ];
@@ -64,6 +65,21 @@
       { value: "accepted", label: "Accepted" },
       { value: "declined", label: "Declined" },
       { value: "waitlisted", label: "Waitlisted" }
+    ];
+
+    const MONTH_SHORT = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
     ];
 
     function defaultFilters() {
@@ -83,6 +99,8 @@
         actionableCfp: "",
         industryTalks: "",
         inPipeline: "",
+        eventYear: "",
+        eventMonths: "",
         sortBy: "deadline_soon"
       };
     }
@@ -144,6 +162,7 @@
       activeFilterMeta: document.getElementById("activeFilterMeta"),
       activeFilterChips: document.getElementById("activeFilterChips"),
       summaryCards: document.getElementById("summaryCards"),
+      resultsCount: document.getElementById("resultsCount"),
       dataThead: document.querySelector("#dataTable thead"),
       dataTbody: document.querySelector("#dataTable tbody"),
       emptyState: document.getElementById("emptyState"),
@@ -184,6 +203,8 @@
       pipelineYearFilter: document.getElementById("pipelineYearFilter"),
       tripsYearFilter: document.getElementById("tripsYearFilter"),
       favoritesFilter: document.getElementById("favoritesFilter"),
+      eventYearFilter: document.getElementById("eventYearFilter"),
+      eventMonthsFilter: document.getElementById("eventMonthsFilter"),
       exportStorageBtn: document.getElementById("exportStorageBtn"),
       importStorageBtn: document.getElementById("importStorageBtn"),
       importStorageFile: document.getElementById("importStorageFile"),
@@ -198,6 +219,11 @@
       conferenceDetailHint: document.getElementById("conferenceDetailHint"),
       conferenceDetailClose: document.getElementById("conferenceDetailClose"),
       discoverQuickActions: document.getElementById("discoverQuickActions"),
+      filtersCard: document.getElementById("filtersCard"),
+      filtersWrap: document.getElementById("filtersWrap"),
+      filtersPanelBody: document.getElementById("filtersPanelBody"),
+      filtersPanelToggle: document.getElementById("filtersPanelToggle"),
+      filtersActiveBadge: document.getElementById("filtersActiveBadge"),
       advancedFiltersBtn: document.getElementById("advancedFiltersBtn"),
       advancedFilterFields: [...document.querySelectorAll(".advanced-filter")],
       appViewNav: document.querySelector(".app-view-nav"),
@@ -240,6 +266,7 @@
     };
 
     let advancedFiltersExpanded = false;
+    let filtersPanelOpen = true;
 
     function normalize(value) {
       return (value ?? "").toString().trim();
@@ -861,7 +888,7 @@
       const city = normalize(row.city);
       const country = normalize(row.country);
       const locLine = city || country ? `LOCATION:${escapeIcsText(`${city}${city && country ? ", " : ""}${country}`)}` : "";
-      const site = normalize(row.website_or_cfp_link);
+      const site = normalize(row.website) || normalize(row.cfp_link);
       const userNote = state.notes[name];
       const descParts = [];
       if (site) descParts.push(`Site: ${site}`);
@@ -1104,7 +1131,7 @@
       if (!isAttendeeMode()) {
         body.push(`<dt>CfP mo.</dt><dd>${escapeHtml(normalize(row.cfp_deadline_month))}</dd>`);
         const deadlineLines = [
-          ["CfP", row.cfp_deadline, row.website_or_cfp_link],
+          ["CfP", row.cfp_deadline, rowCfpLink(row)],
           ["CfT", row.cft_deadline, row.cft_link],
           ["CfW", row.cfw_deadline, row.cfw_link],
           ["CfV", row.cfv_deadline, row.cfv_link]
@@ -1135,10 +1162,13 @@
         body.push(`<dt>Next due</dt><dd>${nd ? escapeHtml(formatNextDeadlineText(nd)) : "—"}</dd>`);
       }
       const linkParts = [];
-      if (normalize(row.website_or_cfp_link)) {
-        linkParts.push(`<a href="${escapeHtml(row.website_or_cfp_link)}" target="_blank" rel="noopener noreferrer">Site</a>`);
+      if (normalize(row.website)) {
+        linkParts.push(`<a href="${escapeHtml(row.website)}" target="_blank" rel="noopener noreferrer">Site</a>`);
       }
       if (!isAttendeeMode()) {
+        if (normalize(row.cfp_link) && normalize(row.cfp_link) !== normalize(row.website)) {
+          linkParts.push(`<a href="${escapeHtml(row.cfp_link)}" target="_blank" rel="noopener noreferrer">CfP</a>`);
+        }
         if (normalize(row.cft_link)) {
           linkParts.push(`<a href="${escapeHtml(row.cft_link)}" target="_blank" rel="noopener noreferrer">CfT</a>`);
         }
@@ -1174,31 +1204,43 @@
       if (el.conferenceDetailBody) el.conferenceDetailBody.innerHTML = body.join("");
 
       const enc = encodeURIComponent(name);
-      const parts = [];
-      function detailBtn(action, icon, label) {
-        return `<button type="button" class="detail-action-btn btn-with-icon btn-icon-only" data-detail-action="${action}" data-cname="${enc}"${tipDataAttr(label)} aria-label="${escapeHtml(label)}">${icon}<span class="visually-hidden">${escapeHtml(label)}</span></button>`;
+      const primaryParts = [];
+      const secondaryParts = [];
+      function detailBtn(action, icon, label, opts) {
+        const primary = opts && opts.primary;
+        const cls = primary
+          ? "detail-action-btn detail-action-primary btn-with-icon"
+          : "detail-action-btn btn-with-icon btn-icon-only";
+        const labelCls = primary ? "detail-action-label" : "visually-hidden";
+        return `<button type="button" class="${cls}" data-detail-action="${action}" data-cname="${enc}"${tipDataAttr(label)} aria-label="${escapeHtml(label)}">${icon}<span class="${labelCls}">${escapeHtml(label)}</span></button>`;
       }
       if (state.personaMode === "speaker") {
-        parts.push(
+        primaryParts.push(
           isInPipeline(name)
-            ? detailBtn("pipeline-remove", ICON.remove, "Remove from pipeline")
-            : detailBtn("pipeline-add", ICON.clipboard, "Add to pipeline")
+            ? detailBtn("pipeline-remove", ICON.remove, "Remove from pipeline", { primary: true })
+            : detailBtn("pipeline-add", ICON.clipboard, "Add to pipeline", { primary: true })
         );
       } else if (state.personaMode === "attendee") {
-        parts.push(
+        primaryParts.push(
           isSavedTrip(name)
-            ? detailBtn("saved-remove", ICON.remove, "Remove from trips")
-            : detailBtn("saved-add", ICON.place, "Save to trips")
+            ? detailBtn("saved-remove", ICON.remove, "Remove from trips", { primary: true })
+            : detailBtn("saved-add", ICON.place, "Save to trips", { primary: true })
         );
       }
-      parts.push(
+      secondaryParts.push(
         detailBtn("fav-toggle", isFavorite(name) ? ICON.star : ICON.starOutline, isFavorite(name) ? "Remove favorite" : "Add favorite")
       );
-      parts.push(
+      secondaryParts.push(
         `<button type="button" class="detail-action-btn btn-with-icon btn-icon-only" data-detail-action="ics" data-cname="${enc}"${tipDataAttr("Add to calendar")} aria-label="Add to calendar"${!nd ? " disabled" : ""}>${ICON.calendar}<span class="visually-hidden">Add to calendar</span></button>`
       );
-      parts.push(detailBtn("copy-conf-link", ICON.link, "Copy link"));
-      if (el.conferenceDetailToolbar) el.conferenceDetailToolbar.innerHTML = parts.join(" ");
+      secondaryParts.push(detailBtn("copy-conf-link", ICON.link, "Copy link"));
+      if (el.conferenceDetailToolbar) {
+        const primaryHtml = primaryParts.length
+          ? `<div class="detail-actions-primary">${primaryParts.join("")}</div>`
+          : "";
+        const secondaryHtml = `<div class="detail-actions-secondary">${secondaryParts.join(" ")}</div>`;
+        el.conferenceDetailToolbar.innerHTML = `${primaryHtml}${secondaryHtml}`;
+      }
 
       if (el.conferenceDetailHint) {
         el.conferenceDetailHint.hidden = false;
@@ -1338,49 +1380,21 @@
     }
 
     function applyPrimaryNavModel() {
-      const isMobile = isSmallScreen();
       const buttons = [
         { key: "discover", btn: el.appViewDiscover, label: "Discover" },
         { key: "speaker", btn: el.appViewSpeaker, label: "Pipeline" },
         { key: "attendee", btn: el.appViewAttendee, label: "Trips" },
         { key: "settings", btn: el.appViewSettings, label: "Settings" }
       ];
-      const alwaysVisible = new Set(["discover", "settings"]);
-      if (!isMobile) {
-        buttons.forEach(({ key, btn, label }) => {
-          if (!btn) return;
-          btn.hidden = false;
-          const span = btn.querySelector("span");
-          if (span) span.textContent = label;
-        });
-        return;
-      }
-      const personaSection = state.personaMode;
-      buttons.forEach(({ key, btn }) => {
+      buttons.forEach(({ btn, label }) => {
         if (!btn) return;
-        if (alwaysVisible.has(key)) {
-          btn.hidden = false;
-          return;
-        }
-        btn.hidden = key !== personaSection;
+        btn.hidden = false;
+        const span = btn.querySelector("span");
+        if (span) span.textContent = label;
       });
-      const personaButton = buttons.find((entry) => entry.key === personaSection)?.btn;
-      if (personaButton) {
-        const span = personaButton.querySelector("span");
-        if (span) span.textContent = "My area";
-      }
     }
 
     function applyAppSectionUI() {
-      if (
-        isSmallScreen() &&
-        state.appSection !== "discover" &&
-        state.appSection !== "settings" &&
-        state.appSection !== state.personaMode
-      ) {
-        state.appSection = state.personaMode;
-        saveAppSection();
-      }
       const section = state.appSection;
       const map = {
         discover: el.sectionDiscover,
@@ -1395,7 +1409,8 @@
       document.querySelectorAll(".app-view-nav button[data-app-section]").forEach((btn) => {
         const match = btn.getAttribute("data-app-section") === section;
         btn.classList.toggle("active", match);
-        btn.setAttribute("aria-current", match ? "page" : "false");
+        if (match) btn.setAttribute("aria-current", "page");
+        else btn.removeAttribute("aria-current");
       });
       applyPrimaryNavModel();
       if (section === "speaker" || section === "attendee") {
@@ -1404,21 +1419,25 @@
       if (section === "discover") {
         updateMapIfVisible();
       }
-      const showSpeakerQuick =
-        state.personaMode === "speaker" && section === "discover";
-      if (el.discoverQuickActions) el.discoverQuickActions.hidden = !showSpeakerQuick;
+      updateDiscoverQuickActionsVisibility();
+    }
+
+    function updateDiscoverQuickActionsVisibility() {
+      if (!el.discoverQuickActions) return;
+      const onDiscover = state.appSection === "discover";
+      const speaker = state.personaMode === "speaker" && onDiscover;
+      const attendee = state.personaMode === "attendee" && onDiscover;
+      el.discoverQuickActions.hidden = !(speaker || attendee);
+      el.discoverQuickActions.querySelectorAll(".speaker-preset").forEach((btn) => {
+        btn.hidden = !speaker;
+      });
+      el.discoverQuickActions.querySelectorAll(".attendee-preset").forEach((btn) => {
+        btn.hidden = !attendee;
+      });
     }
 
     function setAppSection(section) {
       if (!["discover", "speaker", "attendee", "settings"].includes(section)) return;
-      if (
-        isSmallScreen() &&
-        section !== "discover" &&
-        section !== "settings" &&
-        section !== state.personaMode
-      ) {
-        section = state.personaMode;
-      }
       state.appSection = section;
       saveAppSection();
       applyAppSectionUI();
@@ -1437,7 +1456,7 @@
 
     function rowActionButton(action, enc, iconHtml, label, title) {
       const tip = title || label;
-      return `<button type="button" class="table-action-btn btn-with-icon btn-icon-only" data-action="${escapeHtml(action)}" data-cname="${enc}"${tipDataAttr(tip)} aria-label="${escapeHtml(tip)}">${iconHtml}<span class="visually-hidden">${escapeHtml(label)}</span></button>`;
+      return `<button type="button" class="table-action-btn table-action-primary btn-with-icon" data-action="${escapeHtml(action)}" data-cname="${enc}"${tipDataAttr(tip)} aria-label="${escapeHtml(tip)}">${iconHtml}<span class="table-action-label">${escapeHtml(label)}</span></button>`;
     }
 
     function renderRowActions(row) {
@@ -1778,8 +1797,11 @@
       const next = theme === "light" ? "light" : "dark";
       state.theme = next;
       document.documentElement.setAttribute("data-theme", next);
-      const metaTheme = document.querySelector('meta[name="theme-color"]');
-      if (metaTheme) metaTheme.setAttribute("content", next === "light" ? "#f4f7f5" : "#050707");
+      const themeColor = next === "light" ? "#ddd2c4" : "#1a1410";
+      document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
+        meta.setAttribute("content", themeColor);
+        meta.removeAttribute("media");
+      });
       if (el.themeToggle) {
         const isLight = next === "light";
         el.themeToggle.setAttribute("aria-pressed", isLight ? "true" : "false");
@@ -1793,6 +1815,7 @@
         el.themeToggleText.textContent = next === "light" ? "Dark mode" : "Light mode";
       }
       if (!opts.skipSave) saveUiPrefs();
+      updateMapIfVisible();
     }
 
     function toggleTheme() {
@@ -1843,6 +1866,68 @@
       applyTheme(state.theme, { skipSave: true });
     }
 
+    function parseEventMonths(raw) {
+      const set = new Set();
+      normalize(raw)
+        .split(/[,|]/)
+        .forEach((tok) => {
+          const n = Number(tok);
+          if (Number.isInteger(n) && n >= 1 && n <= 12) set.add(n);
+        });
+      return set;
+    }
+
+    function serializeEventMonths(monthSet) {
+      return [...monthSet].sort((a, b) => a - b).join(",");
+    }
+
+    function formatEventMonthsLabel(raw) {
+      const months = [...parseEventMonths(raw)].sort((a, b) => a - b);
+      if (!months.length) return "";
+      const parts = [];
+      let i = 0;
+      while (i < months.length) {
+        let j = i;
+        while (j + 1 < months.length && months[j + 1] === months[j] + 1) j += 1;
+        if (j === i) parts.push(MONTH_SHORT[months[i] - 1]);
+        else if (j === i + 1) {
+          parts.push(`${MONTH_SHORT[months[i] - 1]}, ${MONTH_SHORT[months[j] - 1]}`);
+        } else {
+          parts.push(`${MONTH_SHORT[months[i] - 1]}–${MONTH_SHORT[months[j] - 1]}`);
+        }
+        i = j + 1;
+      }
+      return parts.join(", ");
+    }
+
+    function populateEventYearOptions() {
+      if (!el.eventYearFilter) return;
+      const selected = normalize(state.filters.eventYear);
+      const y0 = new Date().getFullYear();
+      let html = `<option value="">Any year</option>`;
+      for (let y = y0 - 1; y <= y0 + 3; y++) {
+        html += `<option value="${y}"${selected === String(y) ? " selected" : ""}>${y}</option>`;
+      }
+      el.eventYearFilter.innerHTML = html;
+      if (selected && ![...el.eventYearFilter.options].some((o) => o.value === selected)) {
+        el.eventYearFilter.insertAdjacentHTML(
+          "beforeend",
+          `<option value="${escapeHtml(selected)}" selected>${escapeHtml(selected)}</option>`
+        );
+      }
+    }
+
+    function applyEventMonthToggles() {
+      if (!el.eventMonthsFilter) return;
+      const selected = parseEventMonths(state.filters.eventMonths);
+      el.eventMonthsFilter.querySelectorAll("[data-month]").forEach((btn) => {
+        const m = Number(btn.getAttribute("data-month"));
+        const on = selected.has(m);
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+        btn.classList.toggle("active", on);
+      });
+    }
+
     function applyFilterValuesToInputs() {
       if (el.searchInput) el.searchInput.value = state.filters.search;
       if (el.attendeesFilter) el.attendeesFilter.value = state.filters.attendees;
@@ -1853,6 +1938,11 @@
       if (el.sponsorshipFilter) el.sponsorshipFilter.value = state.filters.sponsorship;
       if (el.typeFilter) el.typeFilter.value = state.filters.conferenceType;
       if (el.favoritesFilter) el.favoritesFilter.value = state.filters.favoritesOnly;
+      if (el.eventYearFilter) {
+        populateEventYearOptions();
+        el.eventYearFilter.value = normalize(state.filters.eventYear);
+      }
+      applyEventMonthToggles();
       if (el.sortFilter) el.sortFilter.value = state.filters.sortBy || defaultSortByForPersona();
     }
 
@@ -1922,7 +2012,8 @@
         conference_end_date: pickValue(rawRow, ["conference_end_date"]),
         city: pickValue(rawRow, ["city"]),
         country: pickValue(rawRow, ["country"]),
-        website_or_cfp_link: pickValue(rawRow, ["website_or_cfp_link"]),
+        website: pickValue(rawRow, ["website"]),
+        cfp_link: pickValue(rawRow, ["cfp_link"]),
         cft_link: pickValue(rawRow, ["cft_link"]),
         cfw_link: pickValue(rawRow, ["cfw_link"]),
         cfv_link: pickValue(rawRow, ["cfv_link"]),
@@ -1933,6 +2024,36 @@
         notes: pickValue(rawRow, ["notes"]),
         last_verified_date: pickValue(rawRow, ["last_verified_date"])
       };
+    }
+
+    function looksLikeCfpPortalUrl(url) {
+      return /papercall|sessionize|pretalx|\/cfp\b|call[_-]?for|callfor|cfp\.|\/papers\b|\/submit\b|\/abstract/i.test(
+        normalize(url)
+      );
+    }
+
+    /** Legacy CSV used website_or_cfp_link; split into website + cfp_link on load. */
+    function migrateLegacyWebsiteFields(row, rawRow) {
+      const legacy = pickValue(rawRow || row, ["website_or_cfp_link"]);
+      if (!legacy) return;
+      if (!normalize(row.website) && !normalize(row.cfp_link)) {
+        if (looksLikeCfpPortalUrl(legacy)) {
+          row.cfp_link = legacy;
+          row.website = "";
+        } else {
+          row.website = legacy;
+          row.cfp_link = "";
+        }
+      } else if (!normalize(row.cfp_link) && looksLikeCfpPortalUrl(legacy) && legacy !== row.website) {
+        row.cfp_link = legacy;
+      } else if (!normalize(row.website) && !looksLikeCfpPortalUrl(legacy)) {
+        row.website = legacy;
+      }
+    }
+
+    /** Talk CfP URL: dedicated portal, else homepage. */
+    function rowCfpLink(row) {
+      return normalize(row.cfp_link) || normalize(row.website);
     }
 
     const MONTH_NAMES = [
@@ -1998,7 +2119,7 @@
     /** Drop mistaken per-type links (homepage in CfW without a workshop program, etc.). */
     function sanitizePerTypeSubmissionLinks(row) {
       const issues = [];
-      const website = comparableUrl(row.website_or_cfp_link);
+      const siteKeys = [comparableUrl(row.website), comparableUrl(row.cfp_link)].filter(Boolean);
 
       if (normalize(row.cfw_link)) {
         const hasWorkshops = rowHasSubmissionTrack(row, "Workshops");
@@ -2006,12 +2127,8 @@
         if (!hasWorkshops) {
           issues.push("cleared cfw_link (no workshop program)");
           row.cfw_link = "";
-        } else if (
-          website &&
-          cfw === website &&
-          acceptsFromDeadline(row.cfw_deadline) !== "Yes"
-        ) {
-          issues.push("cleared cfw_link (duplicate of website_or_cfp_link)");
+        } else if (cfw && siteKeys.includes(cfw) && acceptsFromDeadline(row.cfw_deadline) !== "Yes") {
+          issues.push("cleared cfw_link (duplicate of website/cfp_link)");
           row.cfw_link = "";
         }
       }
@@ -2022,12 +2139,8 @@
         if (!hasTrainings) {
           issues.push("cleared cft_link (no training program)");
           row.cft_link = "";
-        } else if (
-          website &&
-          cft === website &&
-          acceptsFromDeadline(row.cft_deadline) !== "Yes"
-        ) {
-          issues.push("cleared cft_link (duplicate of website_or_cfp_link)");
+        } else if (cft && siteKeys.includes(cft) && acceptsFromDeadline(row.cft_deadline) !== "Yes") {
+          issues.push("cleared cft_link (duplicate of website/cfp_link)");
           row.cft_link = "";
         }
       }
@@ -2079,6 +2192,7 @@
           }
 
           const row = normalizeRowSchema(rawRow);
+          migrateLegacyWebsiteFields(row, rawRow);
 
           if (!row.conference_name) {
             console.warn(`[ConferenceTracker] Skipping row ${csvRowNumber}: missing conference_name.`);
@@ -2433,9 +2547,18 @@
       return days !== null && days >= 0 && days <= maxDays;
     }
 
+    function updateResultsCount(shown, total) {
+      if (!el.resultsCount) return;
+      const s = Number(shown) || 0;
+      const t = Number(total) || 0;
+      el.resultsCount.textContent = t ? `${s} / ${t}` : "";
+      el.resultsCount.hidden = !t;
+    }
+
     function renderSummary(filteredRows, allRows) {
       const total = allRows.length;
       const shown = filteredRows.length;
+      updateResultsCount(shown, total);
       const favCount = allRows.filter((r) => isFavorite(r.conference_name)).length;
       const largeEvents = filteredRows.filter((r) => toLower(r.attendees_500_plus) === "yes").length;
       const hasCfpDeadline = filteredRows.filter(
@@ -2541,28 +2664,28 @@
           const cells = [
             td("Name", renderNameCell(r), "name-col m-head"),
             td("Favorite", renderFavoriteCell(r), "fav-col fav-col-desktop"),
-            td("500+?", escapeHtml(normalize(r.attendees_500_plus)))
+            td("500+?", escapeHtml(normalize(r.attendees_500_plus)), "col-dense-hide")
           ];
           if (!attendee) {
             cells.push(
-              td("Academic", renderAcceptanceLevelCell(r.academic_acceptance_level), "acceptance-col"),
-              td("Sponsorship", sponsorshipPill(r.travel_accommodation_sponsorship)),
-              td("CfP", renderDeadlineCell(r, "cfp_deadline", r.website_or_cfp_link, "CfP")),
-              td("CfT", renderDeadlineCell(r, "cft_deadline", r.cft_link, "CfT")),
-              td("CfW", renderDeadlineCell(r, "cfw_deadline", r.cfw_link, "CfW"))
+              td("Academic", renderAcceptanceLevelCell(r.academic_acceptance_level), "acceptance-col col-dense-hide"),
+              td("Sponsorship", sponsorshipPill(r.travel_accommodation_sponsorship), "col-optional"),
+              td("CfP", renderDeadlineCell(r, "cfp_deadline", rowCfpLink(r), "CfP")),
+              td("CfT", renderDeadlineCell(r, "cft_deadline", r.cft_link, "CfT"), "col-optional"),
+              td("CfW", renderDeadlineCell(r, "cfw_deadline", r.cfw_link, "CfW"), "col-optional")
             );
           }
           cells.push(
-            td("Start", renderConferenceDateCell(r, "start")),
-            td("End", renderConferenceDateCell(r, "end")),
-            td("Days", renderConferenceDurationCell(r), "duration-col"),
-            td("City", escapeHtml(normalize(r.city))),
-            td("Country", renderCountryFlag(r.country), "country-col")
+            td("Start", renderConferenceDateCell(r, "start"), "date-col"),
+            td("End", renderConferenceDateCell(r, "end"), "col-dense-hide"),
+            td("Days", renderConferenceDurationCell(r), "duration-col col-dense-hide"),
+            td("City", escapeHtml(normalize(r.city)), "city-col"),
+            td("Country", renderCountryFlag(r.country), "country-col col-optional")
           );
           if (!attendee) {
-            cells.push(td("Next Deadline", renderNextDeadline(r)));
+            cells.push(td("Next Deadline", renderNextDeadline(r), "next-due-col"));
           }
-          cells.push(td("Actions", renderRowActions(r), "table-action-cell"));
+          cells.push(td("Actions", renderRowActions(r), "table-action-cell actions-col"));
           return `<tr class="conf-row">${cells.join("")}</tr>`;
         })
         .join("");
@@ -3116,10 +3239,10 @@
     }
 
     function markerColors() {
-      return {
-        stroke: "#d9ffe8",
-        fill: "#00ff9c"
-      };
+      const light = document.documentElement.getAttribute("data-theme") === "light";
+      return light
+        ? { stroke: "#4a2f18", fill: "#6b4423" }
+        : { stroke: "#f0e0c8", fill: "#d2b48c" };
     }
 
     function markerRadiusForPoint(entry) {
@@ -3195,11 +3318,12 @@
         zoomControl: true,
         preferCanvas: true
       }).setView([18, 10], 2);
+      mapInstance.attributionControl.setPrefix(false);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 7,
         minZoom: 2,
         opacity: 0.62,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap">OSM</a>'
       }).addTo(mapInstance);
       mapLayer = L.layerGroup().addTo(mapInstance);
     }
@@ -3316,7 +3440,9 @@
         region: "Region",
         actionableCfp: "Actionable CfP",
         industryTalks: "Industry talks",
-        inPipeline: "Pipeline"
+        inPipeline: "Pipeline",
+        eventYear: "Event year",
+        eventMonths: "Event months"
       };
       const activeEntries = Object.entries(state.filters)
         .filter(([k, v]) => k !== "sortBy" && Boolean(v));
@@ -3347,6 +3473,8 @@
                   ? "Industry + Mixed"
                   : key === "inPipeline" && toLower(value) === "yes"
                     ? "mine only"
+                    : key === "eventMonths"
+                      ? formatEventMonthsLabel(value)
                     : value;
         return `
         <button class="chip" type="button" data-clear-filter="${key}">
@@ -3458,6 +3586,79 @@
       return sorted;
     }
 
+    function monthsTouchedByEdition(start, end) {
+      const set = new Set();
+      if (!start) return set;
+      const endDate = end || start;
+      let cur = new Date(start.getFullYear(), start.getMonth(), 1);
+      const last = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+      for (let i = 0; i < 24 && cur <= last; i++) {
+        set.add(cur.getMonth() + 1);
+        cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+      }
+      return set;
+    }
+
+    function datesOverlapInclusive(aStart, aEnd, bStart, bEnd) {
+      return aStart.getTime() <= bEnd.getTime() && bStart.getTime() <= aEnd.getTime();
+    }
+
+    /** Build a local date; clamp day if invalid (e.g. Feb 29 in non-leap years). */
+    function safeLocalDate(year, monthIndex, day) {
+      const d = new Date(year, monthIndex, day);
+      if (d.getFullYear() !== year || d.getMonth() !== monthIndex) {
+        return new Date(year, monthIndex + 1, 0);
+      }
+      return d;
+    }
+
+    function occurrenceInYear(row, year) {
+      const start = conferenceStartDate(row);
+      if (!start) return null;
+      const end = conferenceEndDate(row) || start;
+      const occStart = safeLocalDate(year, start.getMonth(), start.getDate());
+      let yearDelta = end.getFullYear() - start.getFullYear();
+      let occEnd = safeLocalDate(year + yearDelta, end.getMonth(), end.getDate());
+      if (occEnd < occStart) {
+        occEnd = safeLocalDate(year + 1, end.getMonth(), end.getDate());
+      }
+      return { start: occStart, end: occEnd };
+    }
+
+    function rowMatchesEventWhen(row) {
+      const yearStr = normalize(state.filters.eventYear);
+      const months = parseEventMonths(state.filters.eventMonths);
+      if (!yearStr && months.size === 0) return true;
+
+      const start = conferenceStartDate(row);
+      if (!start) return false;
+      const end = conferenceEndDate(row) || start;
+
+      if (!yearStr) {
+        const touched = monthsTouchedByEdition(start, end);
+        for (const m of months) {
+          if (touched.has(m)) return true;
+        }
+        return false;
+      }
+
+      const year = Number(yearStr);
+      if (!Number.isFinite(year)) return true;
+      const occ = occurrenceInYear(row, year);
+      if (!occ) return false;
+
+      if (months.size === 0) {
+        return referenceYearForRow(row) === year || occ.start.getFullYear() === year;
+      }
+
+      for (const m of months) {
+        const rangeStart = new Date(year, m - 1, 1);
+        const rangeEnd = new Date(year, m, 0, 23, 59, 59, 999);
+        if (datesOverlapInclusive(occ.start, occ.end, rangeStart, rangeEnd)) return true;
+      }
+      return false;
+    }
+
     function rowMatchesFilters(row) {
       const s = state.filters;
       const text = `${normalize(row.conference_name)} ${normalize(row.city)} ${normalize(row.country)}`.toLowerCase();
@@ -3504,6 +3705,7 @@
       }
       if (toLower(s.inPipeline) === "yes" && !isInPipeline(row.conference_name)) return false;
       if (toLower(s.favoritesOnly) === "yes" && !isFavorite(row.conference_name)) return false;
+      if (!rowMatchesEventWhen(row)) return false;
       return true;
     }
 
@@ -3517,6 +3719,15 @@
       state.filters.sponsorship = normalize(el.sponsorshipFilter.value);
       state.filters.conferenceType = normalize(el.typeFilter.value);
       state.filters.favoritesOnly = normalize(el.favoritesFilter?.value);
+      state.filters.eventYear = normalize(el.eventYearFilter?.value);
+      if (el.eventMonthsFilter) {
+        const set = new Set();
+        el.eventMonthsFilter.querySelectorAll("[data-month][aria-pressed='true']").forEach((btn) => {
+          const m = Number(btn.getAttribute("data-month"));
+          if (Number.isInteger(m) && m >= 1 && m <= 12) set.add(m);
+        });
+        state.filters.eventMonths = serializeEventMonths(set);
+      }
       state.filters.sortBy = normalize(el.sortFilter.value) || defaultSortByForPersona();
       if (state.filters.acceptsCft || state.filters.acceptsCfw) {
         state.filters.cftOrCfw = "";
@@ -3601,8 +3812,22 @@
       const f = state.filters;
       el.discoverQuickActions.querySelectorAll("[data-speaker-preset]").forEach((btn) => {
         const preset = btn.getAttribute("data-speaker-preset");
-        btn.classList.toggle("active", isSpeakerPresetActive(preset, f));
-        btn.setAttribute("aria-pressed", isSpeakerPresetActive(preset, f) ? "true" : "false");
+        const active = isSpeakerPresetActive(preset, f);
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+    }
+
+    function renderAttendeePresetActiveState() {
+      if (!el.discoverQuickActions) return;
+      const f = state.filters;
+      el.discoverQuickActions.querySelectorAll("[data-attendee-preset]").forEach((btn) => {
+        const preset = btn.getAttribute("data-attendee-preset");
+        let active = false;
+        if (preset === "favorites_only") active = toLower(f.favoritesOnly) === "yes";
+        if (preset === "attendees_500") active = normalize(f.attendees) === "Yes";
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-pressed", active ? "true" : "false");
       });
     }
 
@@ -3794,6 +4019,34 @@
       }
     }
 
+    function setFiltersPanelOpen(open) {
+      filtersPanelOpen = Boolean(open);
+      if (el.filtersCard) {
+        el.filtersCard.classList.toggle("filters-panel-open", filtersPanelOpen);
+      }
+      if (el.filtersPanelToggle) {
+        el.filtersPanelToggle.setAttribute("aria-expanded", filtersPanelOpen ? "true" : "false");
+      }
+      updateFiltersPanelBadge();
+    }
+
+    function updateFiltersPanelBadge() {
+      if (!el.filtersActiveBadge || !el.filtersPanelToggle) return;
+      const count = getActiveFilterCount();
+      if (count > 0) {
+        el.filtersActiveBadge.hidden = false;
+        el.filtersActiveBadge.textContent = String(count);
+        el.filtersPanelToggle.setAttribute(
+          "aria-label",
+          `Filters, ${count} active`
+        );
+      } else {
+        el.filtersActiveBadge.hidden = true;
+        el.filtersActiveBadge.textContent = "";
+        el.filtersPanelToggle.setAttribute("aria-label", "Filters");
+      }
+    }
+
     function rerender() {
       readFilterValues();
       saveFilters();
@@ -3806,8 +4059,11 @@
       updateFilterMeta();
       renderFilterChips();
       renderSpeakerPresetActiveState();
+      renderAttendeePresetActiveState();
+      updateFiltersPanelBadge();
       renderHeaderInteractions();
       applyPersonaDiscoverUI();
+      updateDiscoverQuickActionsVisibility();
       renderMyPanels();
       refreshConferenceDetailIfOpen();
       updateMapIfVisible();
@@ -3862,6 +4118,7 @@
       }
       state.rows = normalizeAndValidateRows(parsed);
       populateFilterOptions(state.rows);
+      populateEventYearOptions();
       applyFilterValuesToInputs();
       rerender();
       updateMapIfVisible();
@@ -3987,13 +4244,49 @@
 
     function bindEvents() {
       initInstantTips();
-      const rerenderOnInput = [el.searchInput, el.favoritesFilter, el.attendeesFilter, el.acceptsCfpFilter, el.acceptsCftFilter, el.acceptsCfwFilter, el.academicFilter, el.sponsorshipFilter, el.typeFilter, el.sortFilter];
+      const rerenderOnInput = [
+        el.searchInput,
+        el.favoritesFilter,
+        el.eventYearFilter,
+        el.attendeesFilter,
+        el.acceptsCfpFilter,
+        el.acceptsCftFilter,
+        el.acceptsCfwFilter,
+        el.academicFilter,
+        el.sponsorshipFilter,
+        el.typeFilter,
+        el.sortFilter
+      ];
       rerenderOnInput.filter(Boolean).forEach((inputEl) => inputEl.addEventListener("input", rerender));
       rerenderOnInput.filter(Boolean).forEach((inputEl) => inputEl.addEventListener("change", rerender));
+      if (el.eventMonthsFilter) {
+        el.eventMonthsFilter.addEventListener("click", (event) => {
+          const btn = event.target.closest("[data-month]");
+          if (!btn || !el.eventMonthsFilter.contains(btn)) return;
+          const pressed = btn.getAttribute("aria-pressed") === "true";
+          btn.setAttribute("aria-pressed", pressed ? "false" : "true");
+          btn.classList.toggle("active", !pressed);
+          // Prefer conference-date sort when picking travel months.
+          if (
+            !pressed &&
+            !state.headerSort.key &&
+            (state.filters.sortBy === "deadline_soon" || !state.filters.sortBy)
+          ) {
+            state.filters.sortBy = "start_soon";
+            if (el.sortFilter) el.sortFilter.value = "start_soon";
+          }
+          rerender();
+        });
+      }
       if (el.resetBtn) el.resetBtn.addEventListener("click", resetFilters);
       if (el.advancedFiltersBtn) {
         el.advancedFiltersBtn.addEventListener("click", () => {
           setAdvancedFiltersExpanded(!advancedFiltersExpanded);
+        });
+      }
+      if (el.filtersPanelToggle) {
+        el.filtersPanelToggle.addEventListener("click", () => {
+          setFiltersPanelOpen(!filtersPanelOpen);
         });
       }
       if (el.summaryCards) el.summaryCards.addEventListener("click", (event) => {
@@ -4003,9 +4296,15 @@
       });
       if (el.discoverQuickActions) {
         el.discoverQuickActions.addEventListener("click", (event) => {
-          const btn = event.target.closest("[data-speaker-preset]");
-          if (!btn) return;
-          applySpeakerPreset(btn.getAttribute("data-speaker-preset"));
+          const speakerBtn = event.target.closest("[data-speaker-preset]");
+          if (speakerBtn) {
+            applySpeakerPreset(speakerBtn.getAttribute("data-speaker-preset"));
+            return;
+          }
+          const attendeeBtn = event.target.closest("[data-attendee-preset]");
+          if (attendeeBtn) {
+            applyPreset(attendeeBtn.getAttribute("data-attendee-preset"));
+          }
         });
       }
       if (el.activeFilterChips) el.activeFilterChips.addEventListener("click", (event) => {
@@ -4038,8 +4337,15 @@
       });
       if (el.tabDashboard) el.tabDashboard.addEventListener("click", () => setActiveTab("dashboard"));
       if (el.tabMap) el.tabMap.addEventListener("click", () => setActiveTab("map"));
-      window.matchMedia("(max-width: 640px)").addEventListener("change", () => {
+      window.matchMedia("(max-width: 640px)").addEventListener("change", (event) => {
         applyPrimaryNavModel();
+        if (event.matches) {
+          setFiltersPanelOpen(false);
+          setAdvancedFiltersExpanded(false);
+        } else {
+          setFiltersPanelOpen(true);
+          setAdvancedFiltersExpanded(true);
+        }
       });
       if (el.themeToggle) {
         el.themeToggle.addEventListener("click", () => toggleTheme());
@@ -4401,6 +4707,7 @@
       applyAppSectionUI();
       setActiveTab(state.activeTab);
       setAdvancedFiltersExpanded(!isSmallScreen());
+      setFiltersPanelOpen(!isSmallScreen());
       updateMapSourceButtons();
       try {
         await loadCsvAndRender();
