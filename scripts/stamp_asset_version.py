@@ -9,7 +9,15 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-HTML_FILES = ("index.html", "impressum.html", "privacy.html")
+# Root sources + Worker assets dir (wrangler serves ./public).
+HTML_FILES = (
+    "index.html",
+    "impressum.html",
+    "privacy.html",
+    "public/index.html",
+    "public/impressum.html",
+    "public/privacy.html",
+)
 ASSET_RE = re.compile(
     r'(\./(?:styles\.css|app\.js|assets/bootstrap\.js|assets/obfuscate-email\.js))(?:\?v=[^"\']+)?'
 )

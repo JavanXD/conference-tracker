@@ -271,6 +271,7 @@ Cross-cutting: **trust** (verification), **fresh data** (`conferences.csv` + pip
 - [x] Brand assets (2026-10-05): new walnut favicon (`favicon.svg`/`.ico` + apple-touch) and 1200×630 `social-preview.png` OG image; theme-color + cache-bust query; public synced.
 - [x] Event timing filters (2026-10-05): Discover **Event year** + multi-select **Event months** (e.g. Jan–Feb 2027) for travel/speaking windows; URL/localStorage shareable; sorts to conference date when months picked.
 - [x] CSS theme consistency (2026-10-05): purge neon-green leftovers — primary-btn, map markers, leaflet chrome, footer noscript, filters badge contrast, theme-color sync with app toggle; invalid `font-weight: 650` → 600; public synced.
+- [x] Asset stamp covers Worker `public/*.html` (2026-10-05): `stamp_asset_version.py` updates root + `public/` so cache-bust `?v=` reaches `conference-tracker.rasok.at`.
 
 ### Next UI iteration (high priority)
 
