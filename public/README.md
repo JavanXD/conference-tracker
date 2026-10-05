@@ -92,6 +92,18 @@ The UI includes **Backup & restore**: export or import a JSON file of everything
 - **Copy shareable link** — Copies the current URL (filters and `persona` / `view` params) for others or another device.
 - **Calendar (.ics)** — From the detail panel, download an all-day event for the **next upcoming** CfP/CfT/CfW deadline (when the CSV has a valid date).
 
+### Use with an AI agent (Claude, ChatGPT, Cursor, …)
+
+The dataset is plain CSV, so any agent that can fetch a URL can answer questions over it. In the app, **Settings → Use with your AI agent** (or the **Agent prompt** button above the table) copies a ready-made prompt to your clipboard. It tells the agent:
+
+- where the live CSV lives (`/data/conferences.csv`, CC BY 4.0) and to fetch it fresh
+- every column, its allowed values, and how `MM-DD` deadlines resolve against the edition year
+- how to treat `TBD`, stale editions, and `cfp_link` → `website` fallbacks
+- today's date and a deep-link format (`?c=<name>`) back into the tracker
+- example questions tuned to your persona (speaker or attendee)
+
+A machine-readable summary of the same rules is served at [`/llms.txt`](https://conference-tracker.rasok.at/llms.txt). Forks and self-hosted copies generate the prompt with their own origin automatically.
+
 ## Verifying catalog data
 
 Use the [update-conference-data skill](.cursor/skills/update-conference-data/SKILL.md); spot-check in the app and the browser console. Run `python3 scripts/validate_catalog.py` before opening a PR.

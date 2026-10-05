@@ -14,6 +14,7 @@ Conference Tracker is a static site plus a curated CSV catalog. Folders are grou
 | `.github/` | CI workflows and GitHub metadata |
 | `.cursor/skills/` | Agent workflow for catalog updates |
 | `CNAME`, `robots.txt`, `sitemap.xml` | Hosting and SEO |
+| `llms.txt` | Machine-readable dataset summary for AI agents (schema, interpretation rules, example questions); linked from the in-app agent prompt |
 
 ## Local only (gitignored)
 

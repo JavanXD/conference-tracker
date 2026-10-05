@@ -307,6 +307,10 @@
               <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
               <span>Copy link</span>
             </button>
+            <button type="button" id="copyAgentPromptBtn" class="toolbar-btn btn-secondary btn-with-icon" aria-label="Copy a prompt for your AI agent (Claude, ChatGPT, Cursor) that explains this dataset" data-tip="Copy a ready-made prompt for Claude, ChatGPT, or Cursor">
+              <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"/></svg>
+              <span>Agent prompt</span>
+            </button>
           </div>
         </div>
         <div class="table-wrap">
@@ -421,6 +425,30 @@
         </div>
         <p id="backupStatus" class="backup-status" role="status" aria-live="polite"></p>
       </div>
+
+      <div class="card backup-card agent-card" id="agentCard" aria-labelledby="agentHeading">
+        <h2 id="agentHeading">Use with your AI agent</h2>
+        <p class="meta backup-intro">
+          Working in Claude, ChatGPT, Cursor, or another agent? Copy a ready-made prompt that tells it where the open
+          catalog lives, how to read every column, how deadlines resolve, and what to ask. Paste it as the first message
+          of a chat or into a project / custom instructions.
+        </p>
+        <div class="backup-toolbar" role="group" aria-label="Agent prompt actions">
+          <button type="button" id="copyAgentPromptSettingsBtn" class="primary-btn btn-with-icon" aria-describedby="agentPromptStatus">
+            <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            <span>Copy agent prompt</span>
+          </button>
+          <button type="button" id="toggleAgentPromptBtn" class="btn-secondary" aria-expanded="false" aria-controls="agentPromptPreviewWrap">
+            Preview prompt
+          </button>
+          <a class="agent-llms-link" href="./llms.txt" target="_blank" rel="noopener noreferrer">llms.txt (machine-readable schema)</a>
+        </div>
+        <p id="agentPromptStatus" class="backup-status" role="status" aria-live="polite"></p>
+        <div id="agentPromptPreviewWrap" class="agent-prompt-preview-wrap" hidden>
+          <label class="visually-hidden" for="agentPromptPreview">Agent prompt text</label>
+          <textarea id="agentPromptPreview" class="agent-prompt-preview" readonly rows="18" spellcheck="false"></textarea>
+        </div>
+      </div>
     </section>
 
   </main>
@@ -441,6 +469,9 @@
           <ul class="footer-list">
             <li><a href="https://github.com/JavanXD/ConferenceTracker" rel="noopener noreferrer" target="_blank">View on GitHub</a></li>
             <li><a href="https://github.com/JavanXD/ConferenceTracker/blob/main/CONTRIBUTING.md" rel="noopener noreferrer" target="_blank">Add or update a conference</a></li>
+            <li>
+              <button type="button" class="footer-inline-btn" id="footerAgentBtn">Use with an AI agent</button>
+            </li>
             <li>
               <button type="button" class="footer-inline-btn" id="footerShortcutsBtn" aria-keyshortcuts="?">Shortcut keys (?)</button>
             </li>

@@ -272,6 +272,8 @@ Cross-cutting: **trust** (verification), **fresh data** (`conferences.csv` + pip
 - [x] Event timing filters (2026-10-05): Discover **Event year** + multi-select **Event months** (e.g. Jan–Feb 2027) for travel/speaking windows; URL/localStorage shareable; sorts to conference date when months picked.
 - [x] CSS theme consistency (2026-10-05): purge neon-green leftovers — primary-btn, map markers, leaflet chrome, footer noscript, filters badge contrast, theme-color sync with app toggle; invalid `font-weight: 650` → 600; public synced.
 - [x] Asset stamp covers Worker `public/*.html` (2026-10-05): `stamp_asset_version.py` updates root + `public/` so cache-bust `?v=` reaches `conference-tracker.rasok.at`.
+- [x] Mobile conference cards (2026-10-05): denser grid — title+★ one row; Start/City/Country tiles; Next Due + Add footer (fixes label-stack bug from `display:block` winning over flex).
+- [x] Agent prompt CTA (2026-10-05): one-click **Copy agent prompt** (Discover toolbar + Settings card + footer link) for Claude/ChatGPT/Cursor — live CSV URL (origin-agnostic for forks), 24-column schema, deadline/TBD/stale-edition rules, today's date, `?c=` deep link, persona-aware sample questions; collapsible preview + select-text fallback when clipboard is blocked; `llms.txt` served at root. *(Open: JSON-LD `SearchAction` still advertises `?q=`; app reads `?search=`.)*
 
 ### Next UI iteration (high priority)
 

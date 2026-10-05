@@ -211,6 +211,14 @@
       backupStatus: document.getElementById("backupStatus"),
       exportCsvBtn: document.getElementById("exportCsvBtn"),
       copyViewLinkBtn: document.getElementById("copyViewLinkBtn"),
+      copyAgentPromptBtn: document.getElementById("copyAgentPromptBtn"),
+      copyAgentPromptSettingsBtn: document.getElementById("copyAgentPromptSettingsBtn"),
+      toggleAgentPromptBtn: document.getElementById("toggleAgentPromptBtn"),
+      agentPromptPreviewWrap: document.getElementById("agentPromptPreviewWrap"),
+      agentPromptPreview: document.getElementById("agentPromptPreview"),
+      agentPromptStatus: document.getElementById("agentPromptStatus"),
+      agentCard: document.getElementById("agentCard"),
+      footerAgentBtn: document.getElementById("footerAgentBtn"),
       conferenceDetailDialog: document.getElementById("conferenceDetailDialog"),
       conferenceDetailTitle: document.getElementById("conferenceDetailTitle"),
       conferenceDetailBody: document.getElementById("conferenceDetailBody"),
@@ -859,6 +867,136 @@
         });
       } else {
         window.prompt("Copy this link:", url);
+      }
+    }
+
+    /* ---------- Agent prompt (copy for Claude / ChatGPT / Cursor) ---------- */
+
+    function agentSiteBase() {
+      // Origin-agnostic so forks and self-hosted copies produce correct URLs.
+      const u = new URL(window.location.href);
+      u.search = "";
+      u.hash = "";
+      if (!u.pathname.endsWith("/")) {
+        u.pathname = u.pathname.replace(/[^/]*$/, "");
+      }
+      return u.toString();
+    }
+
+    function agentSampleQuestions() {
+      const today = startOfToday();
+      const nextYear = today.getFullYear() + 1;
+      const shared = [
+        `Which conferences have not been re-verified (last_verified_date) in the last 6 months? I may want to double-check those before planning.`,
+        `Build a markdown table of all conferences in Germany, Austria, and Switzerland in ${nextYear}, sorted by start date, with website links.`,
+        `Which Hybrid or Virtual conferences could I join without travelling?`
+      ];
+      if (state.personaMode === "attendee") {
+        return [
+          `Which conferences with 500+ attendees take place in Europe between January and March ${nextYear}?`,
+          `Plan a 2-week trip for me: find conferences within ~2 weeks of each other in the same region so I can attend both.`,
+          `Which conferences in the catalog are free or community-run? Use the notes column as evidence.`,
+          `List every In-Person conference in the Americas in Q4 this year with city, dates, and website.`,
+          ...shared
+        ];
+      }
+      return [
+        `Which CfPs close in the next 30 days? Show name, city/country, resolved deadline, and the submission link (cfp_link, or website if empty).`,
+        `List European In-Person conferences in Q1 ${nextYear} that offer travel sponsorship (Yes or Partial) and still have an open CfP.`,
+        `Which conferences accept trainings (CfT) and have 500+ attendees? Include the training portal link.`,
+        `Draft a ${nextYear} submission calendar for me: one talk CfP per month, soonest deadline first, no overlapping conference dates.`,
+        `Compare all BSides events in the catalog by region, size, and CfP deadline.`,
+        `Which conferences have a CfP marked TBD but a live submission portal link I should check manually?`,
+        ...shared
+      ];
+    }
+
+    function buildAgentPrompt() {
+      const base = agentSiteBase();
+      const csvUrl = new URL("data/conferences.csv", base).toString();
+      const llmsUrl = new URL("llms.txt", base).toString();
+      const today = startOfToday();
+      const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+      const rowCount = Array.isArray(state.rows) && state.rows.length ? state.rows.length : null;
+      const personaLabel = state.personaMode === "attendee" ? "an attendee planning conference trips" : "a speaker/trainer planning conference submissions";
+      const questions = agentSampleQuestions().map((q) => `- ${q}`).join("\n");
+
+      return `You are helping me, ${personaLabel}, using the open cybersecurity conference catalog from Conference Tracker (${base}).
+
+## Data source
+- CSV (UTF-8, header row${rowCount ? `, ~${rowCount} conferences` : ""}, licence CC BY 4.0): ${csvUrl}
+- Machine-readable schema and rules: ${llmsUrl}
+- Source repository and contribution guide: https://github.com/JavanXD/ConferenceTracker
+Fetch the CSV fresh at the start of a session and whenever I ask for current data; it changes often. Never rely on memorised conference dates. Fields containing commas are quoted; a literal " is escaped as "".
+
+## Columns (24, in this order)
+conference_name; priority_level (High|Medium|Low); attendees_500_plus (Yes|No|Unknown); academic_acceptance_level (Academic|Industry|Mixed|Unknown); submission_tracks (extras only, pipe-separated: CTF|Villages|Panels|Briefings|Unconference|Exhibition|Mentorship); travel_accommodation_sponsorship (Yes|No|Partial|Unknown); cfp_deadline_MM-DD; cft_deadline_MM-DD; cfw_deadline_MM-DD; cfv_deadline_MM-DD (each MM-DD or TBD); conference_start_date; conference_end_date (YYYY-MM-DD or TBD); city; country; website; cfp_link; cft_link; cfw_link; cfv_link; conference_type (In-Person|Hybrid|Virtual); timezone (IANA id); notes; last_verified_date (YYYY-MM-DD); venue_pattern (Rotating|Mostly Fixed|Fixed|Unknown)
+
+## How to interpret the data
+- CfP = talks, CfT = trainings, CfW = workshops, CfV = volunteers/staff. A conference accepts a type if its *_deadline is a valid MM-DD or its *_link is non-empty. Talks/trainings/workshops are never listed in submission_tracks; that column only holds extras such as CTF or Villages.
+- Deadlines are month-day only. Resolve them against the edition year taken from conference_start_date: place the MM-DD in that year; if the result is after the conference start, it belongs to the previous calendar year.
+- Stored conference dates may be the last known edition. If conference_end_date is before today, the next edition is not yet announced: say so explicitly (for example "based on the 2025 edition") and treat +1 year as an estimate, not a fact. Do the same for deadlines derived from such dates.
+- "Open CfP" means the resolved CfP deadline is today or later. TBD means unknown; never invent a date. If a deadline is TBD but a *_link exists, tell me to check the portal.
+- cfp_link falls back to website when empty. The notes column may contain semicolon-separated segments such as "history:", "cfp:", "speakers:" (travel-support nuance), and "src:" (secondary sources).
+- Today is ${todayIso}. Use it for every "upcoming", "open", "overdue", or "this quarter" question.
+- Deep link to a conference in the tracker: ${base}?c=<URL-encoded conference_name>
+
+## How to answer
+- Default to a table with name, city/country, dates, the relevant deadline (with resolved year), and a link; sort by soonest deadline unless I ask otherwise.
+- State how many conferences matched and mention last_verified_date when freshness matters.
+- Flag assumptions (estimated years, TBD values) instead of silently filling gaps.
+
+## Example questions I may ask
+${questions}
+`;
+    }
+
+    function setAgentPromptStatus(message, isError) {
+      if (!el.agentPromptStatus) return;
+      el.agentPromptStatus.textContent = message || "";
+      el.agentPromptStatus.classList.toggle("backup-status-error", Boolean(isError));
+    }
+
+    function refreshAgentPromptPreview() {
+      if (el.agentPromptPreview && el.agentPromptPreviewWrap && !el.agentPromptPreviewWrap.hidden) {
+        el.agentPromptPreview.value = buildAgentPrompt();
+      }
+    }
+
+    function copyAgentPromptToClipboard(source) {
+      const prompt = buildAgentPrompt();
+      if (el.agentPromptPreview) el.agentPromptPreview.value = prompt;
+      const ok = () => {
+        const msg = "Agent prompt copied. Paste it into Claude, ChatGPT, Cursor, or any agent chat.";
+        if (source === "settings") setAgentPromptStatus(msg, false);
+        else setFooterStatus("Agent prompt copied to clipboard.");
+      };
+      const fallback = () => {
+        if (el.agentPromptPreviewWrap && el.agentPromptPreview) {
+          el.agentPromptPreviewWrap.hidden = false;
+          if (el.toggleAgentPromptBtn) el.toggleAgentPromptBtn.setAttribute("aria-expanded", "true");
+          setAppSection("settings");
+          el.agentPromptPreview.focus();
+          el.agentPromptPreview.select();
+          setAgentPromptStatus("Clipboard unavailable: the prompt is selected below, press Ctrl/Cmd+C.", true);
+        } else {
+          window.prompt("Copy this prompt:", prompt);
+        }
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(prompt).then(ok).catch(fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    function openAgentCard() {
+      setAppSection("settings");
+      if (el.agentCard) {
+        window.requestAnimationFrame(() => {
+          el.agentCard.scrollIntoView({ behavior: "smooth", block: "start" });
+          if (el.copyAgentPromptSettingsBtn) el.copyAgentPromptSettingsBtn.focus({ preventScroll: true });
+        });
       }
     }
 
@@ -2427,6 +2565,7 @@
       Italy: { iso2: "IT", region: "europe" },
       Japan: { iso2: "JP", region: "apac" },
       Jordan: { iso2: "JO", region: "mea" },
+      Kazakhstan: { iso2: "KZ", region: "apac" },
       Kenya: { iso2: "KE", region: "africa" },
       Kuwait: { iso2: "KW", region: "mea" },
       Latvia: { iso2: "LV", region: "europe" },
@@ -4067,6 +4206,7 @@
       renderMyPanels();
       refreshConferenceDetailIfOpen();
       updateMapIfVisible();
+      refreshAgentPromptPreview();
     }
 
     function populateFilterOptions(rows) {
@@ -4538,6 +4678,30 @@
       if (el.copyViewLinkBtn) {
         el.copyViewLinkBtn.addEventListener("click", () => {
           copyViewLinkToClipboard();
+        });
+      }
+      if (el.copyAgentPromptBtn) {
+        el.copyAgentPromptBtn.addEventListener("click", () => {
+          copyAgentPromptToClipboard("toolbar");
+        });
+      }
+      if (el.copyAgentPromptSettingsBtn) {
+        el.copyAgentPromptSettingsBtn.addEventListener("click", () => {
+          copyAgentPromptToClipboard("settings");
+        });
+      }
+      if (el.toggleAgentPromptBtn && el.agentPromptPreviewWrap) {
+        el.toggleAgentPromptBtn.addEventListener("click", () => {
+          const show = el.agentPromptPreviewWrap.hidden;
+          el.agentPromptPreviewWrap.hidden = !show;
+          el.toggleAgentPromptBtn.setAttribute("aria-expanded", show ? "true" : "false");
+          el.toggleAgentPromptBtn.textContent = show ? "Hide prompt" : "Preview prompt";
+          if (show) refreshAgentPromptPreview();
+        });
+      }
+      if (el.footerAgentBtn) {
+        el.footerAgentBtn.addEventListener("click", () => {
+          openAgentCard();
         });
       }
       let notesDebounce;

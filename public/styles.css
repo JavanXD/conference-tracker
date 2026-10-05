@@ -1387,15 +1387,16 @@ a { color: var(--accent); }
   }
 
   #dataTable td.m-actions {
-    justify-content: stretch;
+    justify-content: flex-end;
   }
 
   #dataTable td.m-actions .table-action-primary {
-    flex: 1 1 auto;
-    width: 100%;
-    min-height: 44px;
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 5.75rem;
+    min-height: 40px;
     justify-content: center;
-    padding: 10px 12px;
+    padding: 8px 14px;
   }
 
   .detail-dialog-actions {
@@ -1482,13 +1483,13 @@ a { color: var(--accent); }
   }
 
   .conf-card-fav .fav-btn {
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 2.5rem;
+    height: 2.5rem;
     padding: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     border-radius: 10px;
     background: var(--panel-2);
     box-shadow: none;
@@ -1499,14 +1500,37 @@ a { color: var(--accent); }
     border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
   }
 
+  /* Dense card: title+★ | Start/City/Country tiles | due + Add */
   #dataTable tbody tr.conf-row {
-    display: block;
-    margin: 0 0 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+    grid-template-areas:
+      "head head head"
+      "start city country"
+      "due due actions";
+    gap: 8px 8px;
+    margin: 0 0 10px;
     padding: 12px;
     border: 1px solid var(--border);
     border-radius: 14px;
     background: var(--surface);
     box-shadow: none;
+    align-items: stretch;
+  }
+
+  #dataTable tbody tr.conf-row:not(:has(td.m-foot)) {
+    grid-template-areas:
+      "head head head"
+      "start city country"
+      "actions actions actions";
+  }
+
+  #dataTable tbody tr.conf-row:not(:has(td.m-foot)) td.m-actions {
+    justify-content: stretch;
+  }
+
+  #dataTable tbody tr.conf-row:not(:has(td.m-foot)) td.m-actions .table-action-primary {
+    width: 100%;
   }
 
   #dataTable tbody tr.conf-row:nth-child(even) {
@@ -1525,75 +1549,131 @@ a { color: var(--accent); }
   #dataTable th.name-col,
   #dataTable td.name-col {
     min-width: 0;
-    width: 100%;
+    width: auto;
     max-width: none;
   }
 
   #dataTable tbody tr.conf-row > td {
-    display: block;
-    width: 100%;
-    max-width: none;
-    box-sizing: border-box;
-  }
-
-  #dataTable td.m-field,
-  #dataTable td.m-foot {
-    --card-label-w: 5.25rem;
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    gap: 0 10px;
-    text-align: left;
-    width: 100%;
-    padding: 3px 0;
-    border: none;
-    font-size: 0.84rem;
-    white-space: normal;
-    background: transparent;
-  }
-
-  #dataTable td.m-field::before,
-  #dataTable td.m-foot::before {
-    content: attr(data-label);
-    flex: 0 0 var(--card-label-w);
-    margin: 0;
-    padding: 0;
-    color: var(--muted);
-    font-size: 0.68rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    line-height: 1.2;
-    text-align: left;
-    white-space: nowrap;
-  }
-
-  #dataTable td.m-field .m-field-value,
-  #dataTable td.m-foot .m-field-value {
-    flex: 1 1 auto;
-    min-width: 0;
-    text-align: left;
-    justify-content: flex-start;
-    align-items: center;
-    display: flex;
-    flex-flow: row wrap;
-    gap: 4px 6px;
-  }
-
-  #dataTable td.acceptance-col,
-  #dataTable td.country-col {
+    display: none;
     width: auto;
     max-width: none;
-    padding-left: 0;
-    padding-right: 0;
-    text-align: left;
-    font-size: 0.84rem;
-    line-height: 1.35;
+    box-sizing: border-box;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    white-space: normal;
   }
 
-  #dataTable td.acceptance-col .acceptance-emoji {
-    font-size: 1.05rem;
-    line-height: 1;
+  #dataTable td.m-head {
+    display: block !important;
+    grid-area: head;
+    padding: 0 0 2px;
+  }
+
+  #dataTable td.m-head::before,
+  #dataTable td.m-head::after {
+    display: none;
+    content: none;
+  }
+
+  #dataTable td.m-head .name-cell-wrap {
+    width: 100%;
+    gap: 4px;
+  }
+
+  #dataTable td.m-head .conf-card-head {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+  }
+
+  #dataTable td.m-head .name-detail-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto !important;
+    max-width: 100%;
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.3;
+    padding: 4px 2px;
+  }
+
+  @media (hover: hover) {
+    #dataTable td.m-head .name-detail-btn:hover {
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+    }
+  }
+
+  #dataTable td.m-head .name-ellipsis {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  #dataTable td.m-head .name-extra-tracks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  #dataTable td.date-col,
+  #dataTable td.city-col,
+  #dataTable td.country-col {
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+    padding: 8px 9px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--panel-2) 88%, transparent);
+    font-size: 0.84rem;
+    line-height: 1.25;
+  }
+
+  #dataTable td.date-col { grid-area: start; }
+  #dataTable td.city-col { grid-area: city; }
+  #dataTable td.country-col { grid-area: country; }
+
+  #dataTable td.date-col::before,
+  #dataTable td.city-col::before,
+  #dataTable td.country-col::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--muted);
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.1;
+  }
+
+  #dataTable td.date-col .m-field-value,
+  #dataTable td.city-col .m-field-value,
+  #dataTable td.country-col .m-field-value {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+  }
+
+  #dataTable td.date-col .m-field-value {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  #dataTable td.city-col .m-field-value {
+    white-space: nowrap;
   }
 
   #dataTable td.country-col .m-field-value {
@@ -1604,89 +1684,63 @@ a { color: var(--accent); }
   #dataTable td.country-col .country-flag {
     margin: 0;
     justify-content: flex-start;
+    font-size: 1.15rem;
+    line-height: 1;
   }
 
-  #dataTable td.m-head {
-    display: block;
-    width: 100%;
-    max-width: none;
-    padding: 0 0 8px;
-    margin-bottom: 4px;
-    border-bottom: none;
-  }
-
-  #dataTable td.m-head::before {
-    display: none;
-  }
-
-  #dataTable td.m-head .name-cell-wrap {
-    width: 100%;
-  }
-
-  #dataTable td.m-head .conf-card-head {
-    width: 100%;
-    gap: 10px;
-  }
-
-  #dataTable td.m-head::after {
-    content: "";
-    display: block;
-    margin-top: 8px;
-    width: 100%;
-    border-bottom: 1px solid var(--table-divider);
-  }
-
-  #dataTable td.m-head .name-detail-btn {
-    flex: 1;
-    min-width: 0;
-    width: auto;
-    font-size: 1rem;
-    padding: 6px 4px;
-  }
-
-  @media (hover: hover) {
-    #dataTable td.m-head .name-detail-btn:hover {
-      background: color-mix(in srgb, var(--accent) 12%, transparent);
-    }
-  }
-
-  #dataTable td.m-head .name-ellipsis {
-    display: block;
-    overflow: visible;
-    -webkit-line-clamp: unset;
-    white-space: normal;
-    word-break: break-word;
-  }
-
-  #dataTable td.m-fav,
-  #dataTable td.fav-col-desktop {
-    display: none;
-  }
-
-  #dataTable td.deadline-cell-empty {
-    display: none;
+  #dataTable td.country-col .country-flag-text {
+    font-size: 0.78rem;
+    font-weight: 600;
   }
 
   #dataTable td.m-foot {
-    padding-top: 6px;
-    margin-top: 2px;
-    border-top: 1px solid var(--table-divider);
-    width: 100%;
+    display: flex !important;
+    grid-area: due;
+    flex-flow: row wrap;
+    align-items: center;
+    align-self: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 0;
+  }
+
+  #dataTable td.m-foot::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    color: var(--muted);
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  #dataTable td.m-foot .m-field-value {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 4px 6px;
+    min-width: 0;
   }
 
   #dataTable td.m-actions {
-    display: flex;
-    flex-wrap: wrap;
+    display: flex !important;
+    grid-area: actions;
+    flex-wrap: nowrap;
     justify-content: flex-end;
-    gap: 8px;
-    padding-top: 8px;
-    margin-top: 2px;
-    border-top: 1px solid var(--table-divider);
-    width: 100%;
+    align-items: center;
+    align-self: center;
+    gap: 6px;
+    padding: 0;
   }
 
   #dataTable td.m-actions::before {
     display: none;
+  }
+
+  #dataTable td.m-fav,
+  #dataTable td.fav-col-desktop,
+  #dataTable td.deadline-cell-empty {
+    display: none !important;
   }
 
   #dataTable td.m-field .deadline-portal {
@@ -1697,18 +1751,21 @@ a { color: var(--accent); }
     display: inline;
   }
 
-  #dataTable td.m-field .deadline-chip {
+  #dataTable td.m-field .deadline-chip,
+  #dataTable td.m-foot .deadline-chip {
     background: var(--panel-2);
     border-color: var(--border);
     color: var(--text);
   }
 
-  #dataTable td.m-field .deadline-link {
+  #dataTable td.m-field .deadline-link,
+  #dataTable td.m-foot .deadline-link {
     color: inherit;
     text-decoration: none;
   }
 
-  #dataTable td.m-field .deadline-link:active .deadline-chip {
+  #dataTable td.m-field .deadline-link:active .deadline-chip,
+  #dataTable td.m-foot .deadline-link:active .deadline-chip {
     border-color: var(--accent);
   }
 
@@ -2203,6 +2260,45 @@ a.deadline-link:has(.deadline-chip) {
 }
 .backup-status-error {
   color: var(--danger);
+}
+
+/* Agent prompt card (Settings) */
+.agent-card {
+  margin-top: 14px;
+}
+.agent-card .backup-intro {
+  max-width: 40rem;
+}
+.agent-llms-link {
+  font-size: 0.86rem;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.agent-llms-link:hover {
+  color: var(--text);
+}
+.agent-prompt-preview-wrap {
+  margin-top: 10px;
+}
+.agent-prompt-preview {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 12rem;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+.agent-prompt-preview:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
 
 .results-heading-row {
@@ -3242,15 +3338,21 @@ html[data-theme="light"] .leaflet-container .leaflet-tile-pane {
   filter: none;
 }
 
-html[data-theme="light"] .leaflet-control-zoom a {
-  background: var(--panel);
-  color: var(--accent);
-  border-bottom-color: var(--border);
+html[data-theme="light"] #worldMap .leaflet-bar a,
+html[data-theme="light"] #worldMap .leaflet-control-zoom a {
+  background: var(--panel) !important;
+  color: var(--accent) !important;
+  border-bottom-color: var(--border) !important;
 }
 
-html[data-theme="light"] .leaflet-control-zoom a:hover {
-  background: var(--panel-2);
-  color: var(--accent-2);
+html[data-theme="light"] #worldMap .leaflet-bar a:hover,
+html[data-theme="light"] #worldMap .leaflet-control-zoom a:hover {
+  background: var(--panel-2) !important;
+  color: var(--accent-2) !important;
+}
+
+html[data-theme="light"] #worldMap .leaflet-bar {
+  border-color: var(--border) !important;
 }
 
 html[data-theme="light"] .leaflet-popup-content,
