@@ -930,11 +930,12 @@
 
 ## Data source
 - CSV (UTF-8, header row${rowCount ? `, ~${rowCount} conferences` : ""}, licence CC BY 4.0): ${csvUrl}
-- Machine-readable schema and rules: ${llmsUrl}
+- Compact schema + rules (this site): ${llmsUrl}
+- Full maintainer schema: ${ghRepo}/blob/main/docs/CATALOG.md
 - Source repository and contribution guide: ${ghRepo}
-Fetch the CSV fresh at the start of a session and whenever I ask for current data; it changes often. Never rely on memorised conference dates. Fields containing commas are quoted; a literal " is escaped as "".
+Fetch the CSV fresh at the start of a session and whenever I ask for current data; it changes often. Never rely on memorised conference dates. Fields containing commas are quoted; a literal " is escaped as "". Prefer ${llmsUrl} and docs/CATALOG.md for field detail rather than inventing columns.
 
-## Columns (24, in this order)
+## Columns (24, compact — full detail in docs/CATALOG.md and ${llmsUrl})
 conference_name; priority_level (High|Medium|Low); attendees_500_plus (Yes|No|Unknown); academic_acceptance_level (Academic|Industry|Mixed|Unknown); submission_tracks (extras only, pipe-separated: CTF|Villages|Panels|Briefings|Unconference|Exhibition|Mentorship); travel_accommodation_sponsorship (Yes|No|Partial|Unknown); cfp_deadline_MM-DD; cft_deadline_MM-DD; cfw_deadline_MM-DD; cfv_deadline_MM-DD (each MM-DD or TBD); conference_start_date; conference_end_date (YYYY-MM-DD or TBD); city; country; website; cfp_link; cft_link; cfw_link; cfv_link; conference_type (In-Person|Hybrid|Virtual); timezone (IANA id); notes; last_verified_date (YYYY-MM-DD); venue_pattern (Rotating|Mostly Fixed|Fixed|Unknown)
 
 ## How to interpret the data
@@ -942,7 +943,7 @@ conference_name; priority_level (High|Medium|Low); attendees_500_plus (Yes|No|Un
 - Deadlines are month-day only. Resolve them against the edition year taken from conference_start_date: place the MM-DD in that year; if the result is after the conference start, it belongs to the previous calendar year.
 - Stored conference dates may be the last known edition. If conference_end_date is before today, the next edition is not yet announced: say so explicitly (for example "based on the 2025 edition") and treat +1 year as an estimate, not a fact. Do the same for deadlines derived from such dates.
 - "Open CfP" means the resolved CfP deadline is today or later. TBD means unknown; never invent a date. If a deadline is TBD but a *_link exists, tell me to check the portal.
-- cfp_link falls back to website when empty. The notes column may contain semicolon-separated segments such as "history:", "cfp:", "speakers:" (travel-support nuance), and "src:" (secondary sources).
+- cfp_link falls back to website when empty. One fact per column — never repeat dates or URLs in notes. Notes may use semicolon-separated segments such as "history:", "cfp:", "speakers:" (travel-support nuance), and "src:" (secondary sources).
 - Today is ${todayIso}. Use it for every "upcoming", "open", "overdue", or "this quarter" question.
 - Deep link to a conference in the tracker: ${base}?c=<URL-encoded conference_name>
 

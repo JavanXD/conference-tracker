@@ -8,39 +8,16 @@ Source repository: https://github.com/JavanXD/ConferenceTracker
 ## Data
 
 - CSV catalog (UTF-8, header row, RFC 4180 quoting): https://conference-tracker.rasok.at/data/conferences.csv
-- Full schema documentation: https://github.com/JavanXD/ConferenceTracker/blob/main/docs/CATALOG.md
+- Full schema (columns, enums, notes, UI mapping): https://github.com/JavanXD/ConferenceTracker/blob/main/docs/CATALOG.md
 - Contribution guide: https://github.com/JavanXD/ConferenceTracker/blob/main/CONTRIBUTING.md
 
 Fetch the CSV fresh for every session; rows are re-verified regularly and `last_verified_date` tells you when. Do not rely on memorised dates.
 
-## Columns (24, fixed order)
+## Columns (24, fixed order — compact)
 
-| # | Column | Values |
-|---|--------|--------|
-| 1 | conference_name | Official name (unique key) |
-| 2 | priority_level | High, Medium, Low |
-| 3 | attendees_500_plus | Yes, No, Unknown |
-| 4 | academic_acceptance_level | Academic, Industry, Mixed, Unknown |
-| 5 | submission_tracks | Extras only, pipe-separated: CTF, Villages, Panels, Briefings, Unconference, Exhibition, Mentorship (talks/trainings/workshops are never listed here) |
-| 6 | travel_accommodation_sponsorship | Yes, No, Partial, Unknown |
-| 7 | cfp_deadline_MM-DD | Talk CfP close date, MM-DD or TBD |
-| 8 | cft_deadline_MM-DD | Training CfT close date, MM-DD or TBD |
-| 9 | cfw_deadline_MM-DD | Workshop CfW close date, MM-DD or TBD |
-| 10 | cfv_deadline_MM-DD | Volunteer/staff CfV close date, MM-DD or TBD |
-| 11 | conference_start_date | YYYY-MM-DD or TBD |
-| 12 | conference_end_date | YYYY-MM-DD or TBD |
-| 13 | city | Plain text, may be TBD |
-| 14 | country | Normalised English country name |
-| 15 | website | Conference homepage |
-| 16 | cfp_link | Dedicated talk submission portal; empty means use website |
-| 17 | cft_link | Dedicated training portal (implies trainings accepted) |
-| 18 | cfw_link | Dedicated workshop portal (implies workshops accepted) |
-| 19 | cfv_link | Volunteer / staff call |
-| 20 | conference_type | In-Person, Hybrid, Virtual |
-| 21 | timezone | IANA time zone id |
-| 22 | notes | Semicolon-separated segments: leading blurb; `history: YYYY City; ...`; `cfp: ...`; `speakers: ...` (travel-support nuance); `src: <url>` |
-| 23 | last_verified_date | YYYY-MM-DD when the row was last checked |
-| 24 | venue_pattern | Rotating, Mostly Fixed, Fixed, Unknown |
+conference_name; priority_level (High|Medium|Low); attendees_500_plus (Yes|No|Unknown); academic_acceptance_level (Academic|Industry|Mixed|Unknown); submission_tracks (extras only, pipe-separated: CTF|Villages|Panels|Briefings|Unconference|Exhibition|Mentorship — never Talks/Trainings/Workshops); travel_accommodation_sponsorship (Yes|No|Partial|Unknown); cfp_deadline_MM-DD; cft_deadline_MM-DD; cfw_deadline_MM-DD; cfv_deadline_MM-DD (each MM-DD or TBD); conference_start_date; conference_end_date (YYYY-MM-DD or TBD); city; country; website; cfp_link; cft_link; cfw_link; cfv_link; conference_type (In-Person|Hybrid|Virtual); timezone (IANA id); notes (blurb + optional history:/cfp:/speakers:/src: segments); last_verified_date (YYYY-MM-DD); venue_pattern (Rotating|Mostly Fixed|Fixed|Unknown)
+
+For field-by-field detail, notes format, and dashboard mapping, use `docs/CATALOG.md` (link above).
 
 ## Interpretation rules
 
@@ -48,7 +25,7 @@ Fetch the CSV fresh for every session; rows are re-verified regularly and `last_
 - Deadlines store month and day only. Resolve against the edition year from `conference_start_date`: place the MM-DD in that year; if the result is after the conference start, subtract one year.
 - Conference dates may be the last known edition. If `conference_end_date` is in the past, the next edition is unannounced: state that explicitly and treat +1 year as an estimate.
 - Open CfP = resolved CfP deadline >= today. TBD = unknown; never invent a date. TBD plus a `*_link` means "check the portal".
-- `cfp_link` falls back to `website` when empty.
+- `cfp_link` falls back to `website` when empty. One fact per column — never repeat dates or URLs in `notes`.
 - Deep link to a conference in the UI: https://conference-tracker.rasok.at/?c=<URL-encoded conference_name>
 - Shareable filtered views use query params such as `?persona=speaker|attendee`, `?view=discover|speaker|attendee|settings`, `?search=<text>`, `?region=europe|americas|apac`, `?eventYear=YYYY`, `?eventMonths=1,2`.
 
@@ -62,7 +39,7 @@ The catalog is community-maintained in a public GitHub repository with forks and
 
 - Guides: https://github.com/JavanXD/ConferenceTracker/blob/main/CONTRIBUTING.md (PR flow), https://github.com/JavanXD/ConferenceTracker/blob/main/docs/CATALOG.md (schema), https://github.com/JavanXD/ConferenceTracker/blob/main/.cursor/skills/update-conference-data/SKILL.md (research workflow).
 - Evidence first: change a cell only when the official site or submission portal confirms it; keep `TBD` / `Unknown` rather than guessing. Cite source URLs in the PR body; add a `src:` note segment only for secondary sources.
-- Edit only `data/conferences.csv`. Keep the 24-column header order, `MM-DD` deadlines, `YYYY-MM-DD` conference dates, one fact per column (never repeat dates or URLs in `notes`), set `last_verified_date` to today on each touched row, quote fields containing commas.
+- Edit only `data/conferences.csv`. Keep the 24-column header order, `MM-DD` deadlines, `YYYY-MM-DD` conference dates, one fact per column, set `last_verified_date` to today on each touched row, quote fields containing commas.
 - With git + GitHub CLI:
   `gh repo fork JavanXD/ConferenceTracker --clone && cd ConferenceTracker && git checkout -b chore/update-<slug>`
   edit the CSV, then `python3 scripts/validate_catalog.py` (must pass),

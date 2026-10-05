@@ -9,12 +9,12 @@ Conference Tracker is a static site plus a curated CSV catalog. Folders are grou
 | `index.html`, `app.js`, `styles.css` | Dashboard entry and UI (GitHub Pages serves from repo root) |
 | `assets/` | Favicons, social preview image, README screenshots |
 | `data/` | `conferences.csv` — canonical catalog |
-| `docs/` | Schema (`CATALOG.md`) and this layout guide |
+| `docs/` | Canonical catalog schema (`CATALOG.md`) and this layout guide |
 | `scripts/` | Public maintainer tools (e.g. `validate_catalog.py`, run in CI) |
 | `.github/` | CI workflows and GitHub metadata |
-| `.cursor/skills/` | Agent workflow for catalog updates |
+| `.cursor/skills/` | Agent research workflow for catalog updates (points at `CATALOG.md`) |
 | `CNAME`, `robots.txt`, `sitemap.xml` | Hosting and SEO |
-| `llms.txt` | Machine-readable dataset summary for AI agents (schema, interpretation rules, example questions); linked from the in-app agent prompt |
+| `llms.txt` | Compact machine-readable summary for end-user AI agents (not a second full schema); linked from the in-app agent prompt |
 
 ## Local only (gitignored)
 
