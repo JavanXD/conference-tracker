@@ -56,6 +56,21 @@ Fetch the CSV fresh for every session; rows are re-verified regularly and `last_
 
 Table with name, city/country, dates, relevant deadline (with resolved year), link; sorted by soonest deadline; include match count; flag estimates and TBD values; cite `last_verified_date` when freshness matters.
 
+## Contributing corrections (newer dates, missing conferences, stale rows)
+
+The catalog is community-maintained in a public GitHub repository with forks and issues enabled. When you find a newer edition, a changed or missing deadline, a dead link, an unlisted conference, or a row whose `last_verified_date` is old and whose official site now disagrees, offer to contribute it back. Ask the user before pushing anything under their account.
+
+- Guides: https://github.com/JavanXD/ConferenceTracker/blob/main/CONTRIBUTING.md (PR flow), https://github.com/JavanXD/ConferenceTracker/blob/main/docs/CATALOG.md (schema), https://github.com/JavanXD/ConferenceTracker/blob/main/.cursor/skills/update-conference-data/SKILL.md (research workflow).
+- Evidence first: change a cell only when the official site or submission portal confirms it; keep `TBD` / `Unknown` rather than guessing. Cite source URLs in the PR body; add a `src:` note segment only for secondary sources.
+- Edit only `data/conferences.csv`. Keep the 24-column header order, `MM-DD` deadlines, `YYYY-MM-DD` conference dates, one fact per column (never repeat dates or URLs in `notes`), set `last_verified_date` to today on each touched row, quote fields containing commas.
+- With git + GitHub CLI:
+  `gh repo fork JavanXD/ConferenceTracker --clone && cd ConferenceTracker && git checkout -b chore/update-<slug>`
+  edit the CSV, then `python3 scripts/validate_catalog.py` (must pass),
+  `git commit -am "Update: <Conference Name> dates and links" && git push -u origin HEAD`,
+  `gh pr create --title "Update: <Conference Name> ..." --body "<changed fields, sources, estimates>"`.
+- Without a shell: output the full replacement CSV row(s) in a code block plus a PR title (`Add: <name>` or `Update: <name> ...`) and a short body (conference names, changed fields, sources, estimates) for the user to open the PR, or direct them to https://github.com/JavanXD/ConferenceTracker/issues/new.
+- Keep PRs scoped to one conference or one related batch; no unrelated reformatting.
+
 ## Example questions
 
 - Which CfPs close in the next 30 days? Include the submission link.
@@ -64,6 +79,7 @@ Table with name, city/country, dates, relevant deadline (with resolved year), li
 - Draft a submission calendar for next year: one talk CfP per month, no overlapping conference dates.
 - Which conferences with 500+ attendees take place in Europe between January and March next year?
 - Which conferences have not been re-verified in the last 6 months?
+- <Conference> announced new dates on its website. Prepare a PR that updates its row.
 
 ## Optional
 

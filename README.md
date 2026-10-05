@@ -101,6 +101,7 @@ The dataset is plain CSV, so any agent that can fetch a URL can answer questions
 - how to treat `TBD`, stale editions, and `cfp_link` → `website` fallbacks
 - today's date and a deep-link format (`?c=<name>`) back into the tracker
 - example questions tuned to your persona (speaker or attendee)
+- how to contribute back when it finds newer, missing, or stale data: evidence-first CSV edit rules, fork → branch → `validate_catalog.py` → `gh pr create`, or a paste-ready row plus PR title/body if it has no shell
 
 A machine-readable summary of the same rules is served at [`/llms.txt`](https://conference-tracker.rasok.at/llms.txt). Forks and self-hosted copies generate the prompt with their own origin automatically.
 

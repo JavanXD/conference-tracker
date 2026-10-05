@@ -918,6 +918,8 @@
       const today = startOfToday();
       const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
       const rowCount = Array.isArray(state.rows) && state.rows.length ? state.rows.length : null;
+      const nextYear = today.getFullYear() + 1;
+      const ghRepo = "https://github.com/JavanXD/ConferenceTracker";
       const personaLabel = state.personaMode === "attendee" ? "an attendee planning conference trips" : "a speaker/trainer planning conference submissions";
       const questions = agentSampleQuestions().map((q) => `- ${q}`).join("\n");
 
@@ -926,7 +928,7 @@
 ## Data source
 - CSV (UTF-8, header row${rowCount ? `, ~${rowCount} conferences` : ""}, licence CC BY 4.0): ${csvUrl}
 - Machine-readable schema and rules: ${llmsUrl}
-- Source repository and contribution guide: https://github.com/JavanXD/ConferenceTracker
+- Source repository and contribution guide: ${ghRepo}
 Fetch the CSV fresh at the start of a session and whenever I ask for current data; it changes often. Never rely on memorised conference dates. Fields containing commas are quoted; a literal " is escaped as "".
 
 ## Columns (24, in this order)
@@ -946,8 +948,18 @@ conference_name; priority_level (High|Medium|Low); attendees_500_plus (Yes|No|Un
 - State how many conferences matched and mention last_verified_date when freshness matters.
 - Flag assumptions (estimated years, TBD values) instead of silently filling gaps.
 
+## Contribute back when you find newer, missing, or stale data
+The catalog is community-maintained on GitHub (public repo, forks and issues enabled). If while answering you find a newer edition, a changed or missing deadline, a dead link, a conference that is not listed, or a row whose last_verified_date is old and whose official site now says something else, offer to contribute it back. Ask me before pushing anything under my name.
+- Rules: ${ghRepo}/blob/main/CONTRIBUTING.md and the schema ${ghRepo}/blob/main/docs/CATALOG.md (research workflow: ${ghRepo}/blob/main/.cursor/skills/update-conference-data/SKILL.md).
+- Evidence first: only change a cell when the official conference site or submission portal confirms it; keep TBD/Unknown rather than guessing. Put the source URL in the PR body (and as a "src:" note segment only if it is a secondary source).
+- Edit only data/conferences.csv. Keep the 24-column header order; keep MM-DD for deadlines and YYYY-MM-DD for conference dates; one fact per column (no dates/URLs repeated in notes); set last_verified_date to today on every row you touch; quote fields that contain commas.
+- If you have a shell with git and the GitHub CLI: gh repo fork JavanXD/ConferenceTracker --clone && cd ConferenceTracker && git checkout -b chore/update-<slug>; edit the CSV; run python3 scripts/validate_catalog.py (must pass); git commit -am "Update: <Conference Name> dates and links"; git push -u origin HEAD; gh pr create --title "Update: <Conference Name> ..." --body "<what changed, which fields, sources, anything estimated>".
+- If you cannot run commands: give me the complete replacement CSV row(s) in a code block, a PR title in the form "Add: <name>" or "Update: <name> ...", and a short PR body listing conference names, changed fields, sources, and estimates, so I can open the PR myself. Alternatively point me to ${ghRepo}/issues/new with the same content.
+- Keep PRs scoped (one conference or one clearly related batch), no unrelated reformatting.
+
 ## Example questions I may ask
 ${questions}
+- I found that <conference> has new ${nextYear} dates on its website. Prepare a PR that updates the row.
 `;
     }
 
