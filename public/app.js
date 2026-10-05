@@ -219,6 +219,9 @@
       agentPromptStatus: document.getElementById("agentPromptStatus"),
       agentCard: document.getElementById("agentCard"),
       footerAgentBtn: document.getElementById("footerAgentBtn"),
+      copyAgentPromptHeaderBtn: document.getElementById("copyAgentPromptHeaderBtn"),
+      headerAgentInfoBtn: document.getElementById("headerAgentInfoBtn"),
+      agentPromptHeaderStatus: document.getElementById("agentPromptHeaderStatus"),
       conferenceDetailDialog: document.getElementById("conferenceDetailDialog"),
       conferenceDetailTitle: document.getElementById("conferenceDetailTitle"),
       conferenceDetailBody: document.getElementById("conferenceDetailBody"),
@@ -975,12 +978,26 @@ ${questions}
       }
     }
 
+    let agentHeaderStatusTimer = 0;
+    function setAgentHeaderStatus(message, isError) {
+      if (!el.agentPromptHeaderStatus) return;
+      window.clearTimeout(agentHeaderStatusTimer);
+      el.agentPromptHeaderStatus.textContent = message || "";
+      el.agentPromptHeaderStatus.classList.toggle("backup-status-error", Boolean(isError));
+      if (message && !isError) {
+        agentHeaderStatusTimer = window.setTimeout(() => {
+          el.agentPromptHeaderStatus.textContent = "";
+        }, 6000);
+      }
+    }
+
     function copyAgentPromptToClipboard(source) {
       const prompt = buildAgentPrompt();
       if (el.agentPromptPreview) el.agentPromptPreview.value = prompt;
       const ok = () => {
         const msg = "Agent prompt copied. Paste it into Claude, ChatGPT, Cursor, or any agent chat.";
         if (source === "settings") setAgentPromptStatus(msg, false);
+        else if (source === "header") setAgentHeaderStatus("Copied. Paste it as the first message in your agent chat.", false);
         else setFooterStatus("Agent prompt copied to clipboard.");
       };
       const fallback = () => {
@@ -991,6 +1008,7 @@ ${questions}
           el.agentPromptPreview.focus();
           el.agentPromptPreview.select();
           setAgentPromptStatus("Clipboard unavailable: the prompt is selected below, press Ctrl/Cmd+C.", true);
+          if (source === "header") setAgentHeaderStatus("Clipboard unavailable: see Settings, the prompt is selected there.", true);
         } else {
           window.prompt("Copy this prompt:", prompt);
         }
@@ -1002,8 +1020,14 @@ ${questions}
       }
     }
 
-    function openAgentCard() {
+    function openAgentCard(expandPreview) {
       setAppSection("settings");
+      if (expandPreview && el.agentPromptPreviewWrap && el.toggleAgentPromptBtn) {
+        el.agentPromptPreviewWrap.hidden = false;
+        el.toggleAgentPromptBtn.setAttribute("aria-expanded", "true");
+        el.toggleAgentPromptBtn.textContent = "Hide prompt";
+        refreshAgentPromptPreview();
+      }
       if (el.agentCard) {
         window.requestAnimationFrame(() => {
           el.agentCard.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -4714,6 +4738,16 @@ ${questions}
       if (el.footerAgentBtn) {
         el.footerAgentBtn.addEventListener("click", () => {
           openAgentCard();
+        });
+      }
+      if (el.copyAgentPromptHeaderBtn) {
+        el.copyAgentPromptHeaderBtn.addEventListener("click", () => {
+          copyAgentPromptToClipboard("header");
+        });
+      }
+      if (el.headerAgentInfoBtn) {
+        el.headerAgentInfoBtn.addEventListener("click", () => {
+          openAgentCard(true);
         });
       }
       let notesDebounce;

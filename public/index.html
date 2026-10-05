@@ -104,7 +104,7 @@
         <div>
           <h1 id="pageTitle">Conference Tracker</h1>
           <p class="meta header-tagline" id="headerTagline">
-            Browse cybersecurity conference CfP, CfT, and CfW deadlines with filters and a world map.
+            Open catalog of infosec conference CfP, CfT, and CfW deadlines — browse it here, or hand it to your AI agent.
           </p>
         </div>
         <div class="header-tools">
@@ -131,6 +131,17 @@
             <p class="persona-hint" id="personaHint" aria-live="polite"></p>
           </div>
         </div>
+      </div>
+      <div class="header-agent-row" role="group" aria-labelledby="headerAgentLead">
+        <button type="button" id="copyAgentPromptHeaderBtn" class="primary-btn btn-with-icon header-agent-btn" aria-describedby="agentPromptHeaderStatus">
+          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"/></svg>
+          <span>Copy agent prompt</span>
+        </button>
+        <p class="header-agent-lead" id="headerAgentLead">
+          Paste into Claude, ChatGPT, or Cursor. The prompt gives your agent the live CSV, the schema, deadline rules, sample questions, and how to send fixes back as a PR.
+          <button type="button" class="header-agent-link" id="headerAgentInfoBtn">Preview</button>
+        </p>
+        <p id="agentPromptHeaderStatus" class="header-agent-status" role="status" aria-live="polite"></p>
       </div>
     </section>
 

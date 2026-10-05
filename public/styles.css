@@ -313,6 +313,75 @@ h2 {
   line-height: 1.45;
 }
 
+/* Header: AI agent CTA row (primary use) */
+.header-agent-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.header-agent-btn {
+  flex: 0 0 auto;
+}
+.header-agent-lead {
+  margin: 0;
+  flex: 1 1 22rem;
+  min-width: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.header-agent-link {
+  display: inline;
+  border: 0;
+  padding: 0;
+  margin-left: 4px;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  min-height: 0;
+  border-radius: 0;
+}
+.header-agent-link:hover {
+  color: var(--text);
+  box-shadow: none;
+  transform: none;
+  border-color: transparent;
+}
+.header-agent-status {
+  flex: 1 0 100%;
+  margin: 0;
+  min-height: 0;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+.header-agent-status:empty {
+  display: none;
+}
+@media (max-width: 640px) {
+  .header-agent-row {
+    margin-top: 10px;
+    padding-top: 10px;
+    gap: 6px 10px;
+  }
+  .header-agent-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .header-agent-lead {
+    flex: 1 0 100%;
+    font-size: 0.8rem;
+  }
+}
+
 .panel-hint {
   margin: 0;
   font-size: 0.84rem;
@@ -3236,13 +3305,13 @@ html[data-theme="light"] select option {
   color: var(--text);
 }
 
-html[data-theme="light"] button:not(.primary-btn):not(.th-btn):not(.name-detail-btn):not(.footer-link-btn):not(.footer-inline-btn):not(.metric-btn) {
+html[data-theme="light"] button:not(.primary-btn):not(.th-btn):not(.name-detail-btn):not(.footer-link-btn):not(.footer-inline-btn):not(.metric-btn):not(.header-agent-link) {
   background: var(--panel-2);
   color: var(--text);
   border-color: var(--border);
 }
 
-html[data-theme="light"] button:not(.primary-btn):not(.th-btn):not(.name-detail-btn):not(.footer-link-btn):not(.footer-inline-btn):not(.metric-btn):hover {
+html[data-theme="light"] button:not(.primary-btn):not(.th-btn):not(.name-detail-btn):not(.footer-link-btn):not(.footer-inline-btn):not(.metric-btn):not(.header-agent-link):hover {
   border-color: var(--accent);
 }
 

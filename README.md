@@ -94,7 +94,7 @@ The UI includes **Backup & restore**: export or import a JSON file of everything
 
 ### Use with an AI agent (Claude, ChatGPT, Cursor, …)
 
-The dataset is plain CSV, so any agent that can fetch a URL can answer questions over it. In the app, **Settings → Use with your AI agent** (or the **Agent prompt** button above the table) copies a ready-made prompt to your clipboard. It tells the agent:
+The dataset is plain CSV, so any agent that can fetch a URL can answer questions over it. In the app, the **Copy agent prompt** button in the header (also in **Settings → Use with your AI agent** and above the table) copies a ready-made prompt to your clipboard. It tells the agent:
 
 - where the live CSV lives (`/data/conferences.csv`, CC BY 4.0) and to fetch it fresh
 - every column, its allowed values, and how `MM-DD` deadlines resolve against the edition year
