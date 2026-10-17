@@ -244,6 +244,7 @@ Cross-cutting: **trust** (verification), **fresh data** (`conferences.csv` + pip
 
 ## Immediate next actions
 
+- [x] Standing must-refresh for RSAC + majors (2026-10-17): user missed Oct 15 USA CFS; process added in `update-conference-data` skill (Must-refresh majors) + discovery `rsac-usa-cfs` seed so high-signal deadlines stay current.
 - [ ] Approve Phase 0 scope (including **three home IA** wireframes)
 - [ ] Choose stack ADR + MVP verification method
 - [ ] Break Phase 0–1 into implementation tickets with estimates
@@ -282,6 +283,7 @@ Cross-cutting: **trust** (verification), **fresh data** (`conferences.csv` + pip
 - [x] Catalog: DEF CON → DC35 (2026-10-17): dates Aug 5–8 2027 LVCC; CFP keep past close 05-01 (DC34); CfT 11-13 → Microsoft Forms `forms.cloud.microsoft/r/z2f4igJPuu` (2027 multi-city trainings LV/ME/Singapore); CfW `TBD` (DC35 not announced); skill standing rule: research → always write CSV.
 - [x] Catalog: manual CfT refresh (2026-10-17): BruCON / Troopers27 / Nullcon Goa 2027 + Berlin / RSAC 2027 / OrangeCon / SecAppDev / NorthSec / Code Blue / DeepSec / TyphoonCon; follow-up gaps: Black Hat India Briefings+trainings links, Hackfest workshops via Pretalx, CactusCon 15, Nullcon training program URLs. Discovery sync ran (trainers+workshops+owasp) but InfoSecMap returned 403 — 0 LLM leads. Hack in Paris site down — dates TBD.
 - [x] Skill: research answers must update `data/conferences.csv` (2026-10-17) — standing rule in `.cursor/skills/update-conference-data/SKILL.md` (see CATALOG for fields).
+- [x] Standing must-refresh for RSAC + majors (2026-10-17): missed Oct 15 USA CFS; skill **Must-refresh majors** (monthly + on deadline questions) + discovery RSAC CFS seed; catalog keeps past `10-15` close.
 
 ### Next UI iteration (high priority)
 

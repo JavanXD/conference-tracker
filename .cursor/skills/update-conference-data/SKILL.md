@@ -19,6 +19,19 @@ When answering user questions about deadlines, dates, locations, links, or call 
 
 Includes: open/close dates, confirming a call is **closed**, keeping a **past** deadline, a new edition year, announced next-edition dates, `TBD` when an open date is unpublished, link fixes, and location/venue corrections. Field rules stay in [`docs/CATALOG.md`](../../../docs/CATALOG.md) — do not restate the full schema here. Sync `public/data/conferences.csv` after edits when deploying the Worker assets tree.
 
+## Must-refresh majors (cadence)
+
+At least **monthly**, and whenever answering deadline questions, **re-verify** these CFS/CfP/CfT hubs even if the row already “looks fine”:
+
+| Hub | What to check |
+|-----|----------------|
+| **RSAC** | USA CFS (`rsaconference.com/usa/call-for-submissions`) + any regional edition when announced |
+| **Black Hat** | USA / Europe / Asia — briefings CfP + trainings CfT |
+| **DEF CON** | CFP / CfW / Training |
+| **Peers** | BruCON, Nullcon, NDC Security, Troopers, CODE BLUE, HITB (and other High rows already in the catalog) |
+
+**Rules:** past close dates **stay** in `*_deadline_MM-DD` (never clear on close); bump `last_verified_date`; prefer **official** CFS/CfP/CfT pages over aggregators. A URL seed / this priority-verify list is enough — do not invent scrapers for WAF-protected hubs. Local discovery: optional `rsac-usa-cfs` entry in `discovery/01_config/sources.yaml` (see `sources.example.yaml`).
+
 ## Scope
 
 - **In scope:** `data/conferences.csv` only.
