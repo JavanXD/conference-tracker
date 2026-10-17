@@ -13,6 +13,12 @@ description: >-
 **Canonical schema (columns, enums, deadlines, notes, UI mapping):** [`docs/CATALOG.md`](../../../docs/CATALOG.md) — follow it; do not invent parallel rules here.  
 **PR workflow:** [CONTRIBUTING.md](../../../CONTRIBUTING.md).
 
+## Standing rule — research answers update the catalog
+
+When answering user questions about deadlines, dates, locations, links, or call status (or when researching those facts), **always write verified changes into `data/conferences.csv` in the same turn**. Do not leave research-only answers when the catalog can be updated.
+
+Includes: open/close dates, confirming a call is **closed**, keeping a **past** deadline, a new edition year, announced next-edition dates, `TBD` when an open date is unpublished, link fixes, and location/venue corrections. Field rules stay in [`docs/CATALOG.md`](../../../docs/CATALOG.md) — do not restate the full schema here. Sync `public/data/conferences.csv` after edits when deploying the Worker assets tree.
+
 ## Scope
 
 - **In scope:** `data/conferences.csv` only.
