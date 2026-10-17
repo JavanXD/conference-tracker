@@ -26,6 +26,7 @@ At least **monthly**, and whenever answering deadline questions, **re-verify** t
 | Hub | What to check |
 |-----|----------------|
 | **RSAC** | USA CFS (`rsaconference.com/usa/call-for-submissions`) + any regional edition when announced |
+| **OWASP Global AppSec Europe** | Training CfT / CFS (`owasp.org/events`, GlueUp, Sessionize) — Javan P0 attendance; re-check until 2027 CfT dates publish |
 | **Black Hat** | USA / Europe / Asia — briefings CfP + trainings CfT |
 | **DEF CON** | CFP / CfW / Training |
 | **Peers** | BruCON, Nullcon, NDC Security, Troopers, CODE BLUE, HITB (and other High rows already in the catalog) |
