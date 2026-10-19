@@ -285,6 +285,7 @@ Cross-cutting: **trust** (verification), **fresh data** (`conferences.csv` + pip
 - [x] Skill: research answers must update `data/conferences.csv` (2026-10-17) — standing rule in `.cursor/skills/update-conference-data/SKILL.md` (see CATALOG for fields).
 - [x] Standing must-refresh for RSAC + majors (2026-10-17): missed Oct 15 USA CFS; skill **Must-refresh majors** (monthly + on deadline questions) + discovery RSAC CFS seed; catalog keeps past `10-15` close.
 - [x] Catalog: HackMiami added (2026-10-17): 1101 edition 12–16 May 2026 Sunny Isles Beach; CFP close `02-28` email-only (no Sessionize); CfT/CfW TBD; Medium / Mostly Fixed Marenas.
+- [x] Catalog: stale CfT/training refresh (2026-10-19): 19 high-signal rows re-verified from official sources (CanSecWest 2026 DOJOs, Ekoparty BA/Miami dates, Hack.lu/Insomni'hack/NDC/BSidesLV/x33fcon/BH MEA/DEF CON SG/OWASP USA+Portugal+SnowFROC/c0c0n/POC + fixes); skipped BH/DEF CON/BruCON/Nullcon/Troopers/CODE BLUE already fresh 2026-10-17; still TBD CfT: BH MEA trainer portal, Ekoparty email CfT, c0c0n trainer call, OWASP USA 2027.
 
 ### Next UI iteration (high priority)
 
